@@ -9,11 +9,9 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -79,4 +77,86 @@ a:focus,
 a:active {
   outline: none !important;
   box-shadow: none !important;
+}
+
+/* Ensure Swiper container has space for pagination */
+.mySwiper {
+  padding-bottom: 50px !important; /* Add space for pagination bullets */
+}
+
+/* Customize bullet appearance */
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: #d1d5db; /* Gray for inactive */
+  opacity: 0.7;
+  border-radius: 50%;
+  margin: 0 6px;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background: #4f46e5; /* Indigo for active */
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.swiper-pagination-bullet:hover {
+  background: #7c3aed;
+  opacity: 0.9;
+}
+
+/* Custom Scrollbar Styling */
+/* For Webkit browsers (Chrome, Safari, newer versions of Opera) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4f46e5;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4f46e5 #2a2a2a;
+}
+
+/* For Edge and IE */
+@supports (-ms-overflow-style: none) {
+  html {
+    scrollbar-face-color: #4f46e5;
+    scrollbar-track-color: #2a2a2a;
+    scrollbar-arrow-color: #4f46e5;
+    scrollbar-shadow-color: #4f46e5;
+  }
+}
+
+/* For dark/light mode */
+@media (prefers-color-scheme: light) {
+  ::-webkit-scrollbar-track {
+    background: #f0f0f0;
+  }
+
+  * {
+    scrollbar-color: #4f46e5 #f0f0f0;
+  }
+
+  @supports (-ms-overflow-style: none) {
+    html {
+      scrollbar-track-color: #f0f0f0;
+    }
+  }
 }

@@ -3,36 +3,45 @@ import { IoPricetagOutline } from "react-icons/io5";
 
 const ArtworkCard = ({
   artwork,
-  loadingImages,
-  handleImageClick,
-  handleImageLoad,
-  handleImageError,
+  loadingImages = {},
+  handleImageClick = () => {},
+  handleImageLoad = () => {},
+  handleImageError = () => {},
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const imgRef = useRef(null);
 
+  // Initialize local loading state if loadingImages[artwork._id] is undefined
   useEffect(() => {
-    // Only run this check once when the component mounts or when artwork changes
-    if (imgRef.current && imgRef.current.complete && !imageLoaded) {
-      setImageLoaded(true);
+    if (artwork?._id && loadingImages[artwork._id] === undefined) {
       handleImageLoad(artwork._id);
     }
-  }, [artwork._id, handleImageLoad, imageLoaded]);
-
-  // Reset the loaded state when artwork changes
-  useEffect(() => {
-    setImageLoaded(false);
-  }, [artwork._id]);
+  }, [artwork?._id]);
 
   const onImageLoad = () => {
     setImageLoaded(true);
-    handleImageLoad(artwork._id);
+    if (artwork?._id) {
+      handleImageLoad(artwork._id);
+    }
   };
 
   const onImageError = () => {
     setImageLoaded(true); // Still mark as "loaded" to remove skeleton
-    handleImageError(artwork._id);
+    if (artwork?._id) {
+      handleImageError(artwork._id);
+    }
   };
+
+  // If artwork is undefined or null, return a placeholder
+  if (!artwork) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden art-card border border-gray-100 h-64">
+        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+          <p className="text-gray-400">Artwork not available</p>
+        </div>
+      </div>
+    );
+  }
 
   const isLoading = loadingImages[artwork._id] && !imageLoaded;
 
@@ -58,8 +67,13 @@ const ArtworkCard = ({
         )}
         <img
           ref={imgRef}
-          src={artwork.imageUrl}
-          alt={artwork.title}
+          src={
+            artwork.images && artwork.images.length > 0
+              ? artwork.images[0]
+              : artwork.imageUrl ||
+                "https://via.placeholder.com/300?text=No+Image"
+          }
+          alt={artwork.title || "Untitled Artwork"}
           className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${
             isLoading ? "opacity-0" : "opacity-100"
           }`}
@@ -67,21 +81,29 @@ const ArtworkCard = ({
           onError={onImageError}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-          <h3 className="text-white font-bold text-xl mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-            {artwork.title}
-          </h3>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-between items-end p-4">
+          <div className="flex flex-col">
+            <h3 className="capitalize text-white font-bold text-xl mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+              {artwork.title || "Untitled"}
+            </h3>
+            {artwork.artist && (
+              <h4 className="capitalize text-white/80 mb-1 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                By {artwork.artist?.name || "Unknown Artist"}
+              </h4>
+            )}
+          </div>
           <p className="text-white/80 mb-1 text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-            Created on{" "}
-            {new Date(artwork.createdAt).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {artwork.createdAt
+              ? new Date(artwork.createdAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : "Unknown date"}
           </p>
         </div>
         <div className="absolute top-3 left-3 z-10 flex space-x-2">
-          {!isLoading && (
+          {!isLoading && artwork.category && (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 shadow-sm backdrop-blur-sm bg-opacity-90">
               {artwork.category}
             </span>

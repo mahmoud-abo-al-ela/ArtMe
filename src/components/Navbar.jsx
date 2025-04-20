@@ -18,7 +18,14 @@ function Navbar() {
   }, []);
 
   // Function to check if link is active
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path === "/artists") {
+      return (
+        location.pathname === path || location.pathname.startsWith("/artists/")
+      );
+    }
+    return location.pathname === path;
+  };
 
   // Mobile menu animation styles
   const mobileMenuStyle = {
@@ -27,13 +34,13 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-500 ${
+      className={`fixed w-full z-50 ${
         isScrolled
           ? "bg-white/90 backdrop-blur-lg shadow-lg py-2"
           : "bg-transparent py-4"
-      } ${isActive("/") ? "py-2" : ""}`}
+      } ${isActive("/") ? "py-2" : "border-b border-gray-200"}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center justify-center">
             <svg
@@ -103,7 +110,7 @@ function Navbar() {
                   : "text-white hover:text-indigo-200 hover:bg-white/10"
               }`}
             >
-              Gallery
+              Artworks
             </Link>
             <Link
               to="/artists"

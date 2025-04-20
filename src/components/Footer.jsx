@@ -21,9 +21,7 @@ function Footer() {
 
   return (
     <footer
-      className={`w-full transition-all duration-500 py-3 ${
-        isScrolled ? "shadow-lg" : ""
-      }`}
+      className={`w-full transition-all duration-500 py-3 border-t border-gray-200`}
     >
       <div className="max-w-7xl mx-auto px-4">
         <p className="text-center font-medium text-indigo-800">
