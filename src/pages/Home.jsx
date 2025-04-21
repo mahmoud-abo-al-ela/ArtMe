@@ -169,7 +169,7 @@ function Home() {
       </section>
 
       {/* Recent Artworks */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div
             className="flex justify-between items-end mb-10"
@@ -229,7 +229,7 @@ function Home() {
       </section>
 
       {/* Artists Showcase */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div
             className="flex justify-between items-end mb-10"
@@ -291,7 +291,7 @@ function Home() {
                       </p>
                     </div>
                   </div>
-                  <p className="text-gray-500 text-sm line-clamp-3 mb-4">
+                  <p className="text-gray-500 text-sm line-clamp-3 mb-4 capitalize">
                     {artist.bio ||
                       "Talented artist showcasing their creative work."}
                   </p>

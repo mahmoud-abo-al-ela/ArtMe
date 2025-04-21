@@ -16,8 +16,6 @@ function ArtistList() {
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [imageLoading, setImageLoading] = useState({});
   const imagesCache = useRef(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const [artistsPerPage] = useState(9);
@@ -283,15 +281,17 @@ function ArtistList() {
                         )}
                     </div>
                     <p className="text-gray-600 text-sm line-clamp-3 mb-4 capitalize">
-                      {artist.bio || "No bio available"}
+                      {artist.bio ||
+                        "Talented artist showcasing their creative work."}
                     </p>
 
                     {/* Artist's Latest Works Preview */}
-                    {artist.artworks.length > 0 && (
-                      <>
-                        <h2 className="font-medium text-gray-800">
-                          Latest Works
-                        </h2>
+
+                    <>
+                      <h2 className="font-medium text-gray-800">
+                        Latest Works
+                      </h2>
+                      {artist.artworks.length > 0 ? (
                         <div className="mt-4 grid grid-cols-3 gap-2">
                           {artist.artworks
                             .slice(-3)
@@ -318,8 +318,12 @@ function ArtistList() {
                               </div>
                             ))}
                         </div>
-                      </>
-                    )}
+                      ) : (
+                        <p className="text-gray-500 text-sm">
+                          No artworks available
+                        </p>
+                      )}
+                    </>
                   </Link>
                 </div>
               </div>

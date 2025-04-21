@@ -42,12 +42,16 @@ function ArtistProfile() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [filterApplied, setFilterApplied] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [activeSortOption, setActiveSortOption] = useState("newest");
+  const [sortApplied, setSortApplied] = useState(false);
   const [loadingImages, setLoadingImages] = useState({});
   const [fullImage, setFullImage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [artworksPerPage] = useState(6);
 
   const dropdownRef = useRef(null);
+  const sortDropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -55,13 +59,19 @@ function ArtistProfile() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target)
+      ) {
+        setShowSortDropdown(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownRef]);
+  }, [dropdownRef, sortDropdownRef]);
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -98,15 +108,52 @@ function ArtistProfile() {
 
   // Filter artworks when active filter changes
   useEffect(() => {
+    let filtered = [];
     if (activeFilter === "all") {
-      setFilteredArtworks(artworks);
+      filtered = [...artworks];
     } else {
-      const filtered = artworks.filter(
+      filtered = artworks.filter(
         (artwork) => artwork.category === activeFilter
       );
-      setFilteredArtworks(filtered);
     }
-  }, [activeFilter, artworks]);
+
+    // Apply current sorting to the filtered results
+    sortArtworks(filtered, activeSortOption);
+  }, [activeFilter, artworks, activeSortOption]);
+
+  // Function to sort artworks
+  const sortArtworks = (artworksToSort, sortOption) => {
+    let sorted = [...artworksToSort];
+
+    switch (sortOption) {
+      case "newest":
+        sorted.sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+        break;
+      case "oldest":
+        sorted.sort(
+          (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+        );
+        break;
+      default:
+        // Default to newest
+        sorted.sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+    }
+
+    setFilteredArtworks(sorted);
+  };
+
+  // Apply sort when sort option changes
+  const applySorting = (sortOption) => {
+    setActiveSortOption(sortOption);
+    setSortApplied(true);
+    setTimeout(() => setSortApplied(false), 800);
+    setShowSortDropdown(false);
+    setCurrentPage(1); // Reset to first page on sort change
+  };
 
   // Get unique categories for filtering
   const getFilterOptions = () => {
@@ -347,30 +394,12 @@ function ArtistProfile() {
             <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 leading-tight">
               {artist.name}
             </h1>
-            {artist.specialty && (
-              <p className="text-indigo-600 font-medium text-xl mb-4">
-                {artist.specialty}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {artist.tags &&
-                artist.tags.map((tag, index) => (
-                  <motion.span
-                    key={index}
-                    className="bg-white/80 backdrop-blur-sm text-indigo-800 px-4 py-1.5 rounded-full text-sm font-medium shadow-sm"
-                    whileHover={{
-                      scale: 1.05,
-                      backgroundColor: "rgba(255, 255, 255, 0.95)",
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {tag}
-                  </motion.span>
-                ))}
-            </div>
 
             <div className="prose prose-lg max-w-none mb-6">
-              <p className="text-gray-700 leading-relaxed">{artist.bio}</p>
+              <p className="text-gray-700 leading-relaxed">
+                {artist.bio ||
+                  "Talented artist showcasing their creative work."}
+              </p>
             </div>
 
             {/* Social links */}
@@ -447,95 +476,144 @@ function ArtistProfile() {
               <span className="absolute -bottom-3 left-0 w-12 h-2 bg-indigo-200 rounded-full z-0"></span>
             </h2>
 
-            {/* Filter section with dropdown */}
+            {/* Controls section with filter and sort dropdowns */}
             {artworks.length > 0 && (
-              <div
-                className="flex flex-wrap items-center gap-2 relative"
-                ref={dropdownRef}
-              >
-                <motion.div
-                  className="cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all
-                    bg-indigo-600 text-white shadow-md hover:bg-indigo-700 flex items-center gap-2"
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  All ({artworks.length})
-                  <span
-                    className={`transition-transform duration-300 ${
-                      showDropdown ? "rotate-180" : ""
-                    }`}
-                  >
-                    <FiChevronDown />
-                  </span>
-                </motion.div>
-
-                {/* Dropdown menu */}
-                {showDropdown && (
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Filter dropdown */}
+                <div className="relative" ref={dropdownRef}>
                   <motion.div
-                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
+                    className="cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all
+                      bg-indigo-600 text-white shadow-md hover:bg-indigo-700 flex items-center gap-2"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <div className="py-1">
-                      <div
-                        className={`cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-indigo-50 ${
-                          activeFilter === "all"
-                            ? "bg-indigo-100 text-indigo-600 font-medium"
-                            : "text-gray-700"
-                        }`}
-                        onClick={() => {
-                          setActiveFilter("all");
-                          setFilteredArtworks([...artworks]);
-                          setShowDropdown(false);
-                          setFilterApplied(true);
-                          setTimeout(() => setFilterApplied(false), 800);
-                        }}
-                      >
-                        All Categories
+                    {activeFilter === "all" ? "All Categories" : activeFilter} (
+                    {activeFilter === "all"
+                      ? artworks.length
+                      : filteredArtworks.length}
+                    )
+                    <span
+                      className={`transition-transform duration-300 ${
+                        showDropdown ? "rotate-180" : ""
+                      }`}
+                    >
+                      <FiChevronDown />
+                    </span>
+                  </motion.div>
+
+                  {/* Filter dropdown menu */}
+                  {showDropdown && (
+                    <motion.div
+                      className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="py-1">
+                        <div
+                          className={`cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-indigo-50 ${
+                            activeFilter === "all"
+                              ? "bg-indigo-100 text-indigo-600 font-medium"
+                              : "text-gray-700"
+                          }`}
+                          onClick={() => {
+                            setActiveFilter("all");
+                            setShowDropdown(false);
+                            setFilterApplied(true);
+                            setTimeout(() => setFilterApplied(false), 800);
+                          }}
+                        >
+                          All Categories
+                        </div>
+
+                        {/* List all categories together */}
+                        <div className="border-t border-gray-100 my-1"></div>
+
+                        {/* Combined list of unique categories */}
+                        {filterOptions.categories.map((category) => {
+                          // Count artworks in this category
+                          const count = artworks.filter(
+                            (artwork) => artwork.category === category
+                          ).length;
+
+                          return (
+                            <div
+                              key={category}
+                              className={`cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-indigo-50 ${
+                                activeFilter === category
+                                  ? "bg-indigo-100 text-indigo-600 font-medium"
+                                  : "text-gray-700"
+                              } flex justify-between items-center`}
+                              onClick={() => {
+                                setActiveFilter(category);
+                                setShowDropdown(false);
+                                setFilterApplied(true);
+                                setTimeout(() => setFilterApplied(false), 800);
+                              }}
+                            >
+                              <span>{category}</span>
+                              <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 text-xs">
+                                {count}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
+                    </motion.div>
+                  )}
+                </div>
 
-                      {/* List all categories together */}
-                      <div className="border-t border-gray-100 my-1"></div>
+                {/* Sort dropdown */}
+                <div className="relative" ref={sortDropdownRef}>
+                  <motion.div
+                    className="cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all
+                      bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2"
+                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Sort by: {getSortLabel(activeSortOption)}
+                    <span
+                      className={`transition-transform duration-300 ${
+                        showSortDropdown ? "rotate-180" : ""
+                      }`}
+                    >
+                      <FiChevronDown />
+                    </span>
+                  </motion.div>
 
-                      {/* Combined list of unique categories */}
-                      {filterOptions.categories.map((category) => {
-                        // Count artworks in this category
-                        const count = artworks.filter(
-                          (artwork) => artwork.category === category
-                        ).length;
-
-                        return (
+                  {/* Sort dropdown menu */}
+                  {showSortDropdown && (
+                    <motion.div
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="py-1">
+                        {[
+                          { id: "newest", label: "Newest First" },
+                          { id: "oldest", label: "Oldest First" },
+                        ].map((option) => (
                           <div
-                            key={category}
+                            key={option.id}
                             className={`cursor-pointer block w-full text-left px-4 py-2 text-sm hover:bg-indigo-50 ${
-                              activeFilter === category
+                              activeSortOption === option.id
                                 ? "bg-indigo-100 text-indigo-600 font-medium"
                                 : "text-gray-700"
-                            } flex justify-between items-center`}
-                            onClick={() => {
-                              setActiveFilter(category);
-                              const filtered = artworks.filter(
-                                (artwork) => artwork.category === category
-                              );
-                              setFilteredArtworks(filtered);
-                              setShowDropdown(false);
-                              setFilterApplied(true);
-                              setTimeout(() => setFilterApplied(false), 800);
-                            }}
+                            }`}
+                            onClick={() => applySorting(option.id)}
                           >
-                            <span>{category}</span>
-                            <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 text-xs">
-                              {count}
-                            </span>
+                            {option.label}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -561,7 +639,7 @@ function ArtistProfile() {
           <AnimatePresence>
             <motion.div
               className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-max ${
-                filterApplied ? "animate-pulse" : ""
+                filterApplied || sortApplied ? "animate-pulse" : ""
               }`}
               layout
             >
@@ -636,6 +714,17 @@ function ArtistProfile() {
       </motion.div>
     </div>
   );
+}
+
+function getSortLabel(sortOption) {
+  switch (sortOption) {
+    case "newest":
+      return "Newest";
+    case "oldest":
+      return "Oldest";
+    default:
+      return "Newest";
+  }
 }
 
 export default ArtistProfile;
