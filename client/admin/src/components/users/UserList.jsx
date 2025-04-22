@@ -1,6 +1,6 @@
 import React from "react";
 import UserTableRow from "./UserTableRow";
-import LoadingScreen from "../dashboard/LoadingScreen";
+import LoadingScreen from "../common/LoadingScreen";
 import ErrorMessage from "../common/ErrorMessage";
 import EmptyState from "../common/EmptyState";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";

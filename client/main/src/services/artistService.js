@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Get all artists
 export const getAllArtists = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/artists`);
+    const response = await axios.get(`${API_URL}/artists`);
     return response.data;
   } catch (error) {
     console.error("Error fetching artists:", error);
@@ -13,31 +13,38 @@ export const getAllArtists = async () => {
   }
 };
 
-// Get artist by ID
-export const getArtistById = async (id) => {
-  try {
-    if (!id) {
-      throw new Error("Artist ID is required");
-    }
-    const response = await axios.get(`${API_URL}/api/artists/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching artist with ID ${id}:`, error);
-    throw error;
-  }
-};
-
-// Get artist by name (finds in the list then gets details)
+// Get artist by name
 export const getArtistByName = async (name) => {
   try {
     if (!name) {
       throw new Error("Artist name is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/artists/name/${name}`);
-    return response.data;
+    // URL encode the name parameter to handle special characters
+    const encodedName = encodeURIComponent(name);
+    const response = await axios.get(
+      `${API_URL}/artists/profile/public?name=${encodedName}`
+    );
+
+    // Map server response to expected client format
+    const artistData = response.data;
+
+    // Ensure social links are properly structured
+    const socialLinks = {
+      instagram: artistData.social?.instagram || "",
+      facebook: artistData.social?.facebook || "",
+      twitter: artistData.social?.twitter || "",
+      website: artistData.social?.website || "",
+    };
+
+    return {
+      ...artistData,
+      socialLinks: socialLinks,
+      // Ensure artworks array is always defined
+      artworks: artistData.artworks || [],
+    };
   } catch (error) {
-    console.error(`Error fetching artist by name ${name}:`, error);
+    console.error(`Error fetching artist with name ${name}:`, error);
     throw error;
   }
 };
@@ -48,9 +55,7 @@ export const getArtworksByArtist = async (artistId) => {
     if (!artistId) {
       throw new Error("Artist ID is required");
     }
-    const response = await axios.get(
-      `${API_URL}/api/artworks?artist=${artistId}`
-    );
+    const response = await axios.get(`${API_URL}/artworks?artist=${artistId}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching artworks for artist ${artistId}:`, error);

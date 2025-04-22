@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
     const { limit = 10, sort } = req.query;
 
     // Find all users (all are artists) and populate their artworks
-    const query = User.find()
+    const query = User.find({ role: { $ne: "admin" } })
       .select("-password")
       .populate({
         path: "artworks",
@@ -46,61 +46,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get artist by ID (Public)
-router.get("/:id", async (req, res) => {
-  try {
-    const artist = await User.findById(req.params.id)
-      .select("-password")
-      .populate({
-        path: "artworks",
-        select: "title imageUrl images category isForSale price createdAt",
-      })
-      .lean();
-
-    if (!artist) {
-      return res.status(404).json({ message: "Artist not found" });
-    }
-
-    res.json(artist);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Get artist by name (Public)
-router.get("/name/:name", async (req, res) => {
-  try {
-    const nameParam = req.params.name;
-    // Format the name for comparison
-    const formattedName = nameParam
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-
-    // Find artist by name (case insensitive)
-    const artist = await User.findOne({
-      name: { $regex: new RegExp(`^${formattedName}$`, "i") },
-    })
-      .select("-password")
-      .populate({
-        path: "artworks",
-        select: "title imageUrl images category isForSale price createdAt",
-      })
-      .lean();
-
-    if (!artist) {
-      return res.status(404).json({ message: "Artist not found" });
-    }
-
-    res.json(artist);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Get artist profile
+// Get artist's own profile (Private - requires auth)
 router.get("/profile", auth, async (req, res) => {
   try {
     const { id } = req.user;
@@ -123,6 +69,58 @@ router.get("/profile", auth, async (req, res) => {
     };
 
     res.json(profile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get public artist profile with artworks (Public)
+router.get("/profile/public", async (req, res) => {
+  try {
+    let { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({ message: "Artist name is required" });
+    }
+
+    // Decode URL-encoded name and replace hyphens with spaces if needed
+    name = decodeURIComponent(name).replace(/-/g, " ");
+
+    // Use case-insensitive search with regex for more flexible matching
+    const nameRegex = new RegExp(
+      "^" + name.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&") + "$",
+      "i"
+    );
+
+    const user = await User.findOne({ name: nameRegex })
+      .select("-password")
+      .populate({
+        path: "artworks",
+        select: "title imageUrl images category createdAt",
+      })
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ message: "Artist not found" });
+    }
+
+    // Format the response with profile info and artworks
+    const publicProfile = {
+      _id: user._id,
+      name: user.name,
+      bio: user.bio || "",
+      profileImage: user.profileImage || "",
+      socialLinks: {
+        instagram: user.socialLinks?.instagram || "",
+        facebook: user.socialLinks?.facebook || "",
+        twitter: user.socialLinks?.twitter || "",
+        website: user.socialLinks?.website || "",
+      },
+      artworks: user.artworks || [],
+    };
+
+    res.json(publicProfile);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

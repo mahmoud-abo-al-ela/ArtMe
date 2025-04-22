@@ -81,9 +81,21 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    await user.remove();
+    // 1. First, get all artwork IDs associated with the user
+    const Artwork = require("../models/Artwork");
 
-    res.json({ msg: "User removed" });
+    // 2. Delete all artworks created by this user
+    if (user.artworks && user.artworks.length > 0) {
+      await Artwork.deleteMany({ artist: user._id });
+      console.log(
+        `Deleted ${user.artworks.length} artworks associated with user ${user._id}`
+      );
+    }
+
+    // 3. Delete the user
+    await User.deleteOne({ _id: user._id });
+
+    res.json({ msg: "User and all associated artworks removed" });
   } catch (err) {
     console.error(err.message);
     if (err.kind === "ObjectId") {

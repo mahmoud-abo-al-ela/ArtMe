@@ -93,12 +93,20 @@ function App() {
             localStorage.removeItem("token");
             setUser(null);
           } else {
-            // Token is valid, set user
-            setUser({ token, id: decoded.id });
+            // Token is valid, extract user id from either decoded.id or decoded.user.id
+            const userId = decoded.id || (decoded.user && decoded.user.id);
 
-            // Check if token will expire soon (< 30 minutes)
-            if (decoded.exp - currentTime < 1800) {
-              setSessionExpiring(true);
+            if (!userId) {
+              console.error("Could not extract user ID from token");
+              localStorage.removeItem("token");
+              setUser(null);
+            } else {
+              setUser({ token, id: userId });
+
+              // Check if token will expire soon (< 30 minutes)
+              if (decoded.exp - currentTime < 1800) {
+                setSessionExpiring(true);
+              }
             }
           }
         } catch (err) {

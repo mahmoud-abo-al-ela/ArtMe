@@ -41,9 +41,9 @@ function Home() {
     const fetchData = async () => {
       try {
         const [artworksRes, topArtistsRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/artworks?limit=6`),
+          axios.get(`${import.meta.env.VITE_API_URL}/artworks?limit=6`),
           axios.get(
-            `${import.meta.env.VITE_API_URL}/api/artists?sort=artworks&limit=3`
+            `${import.meta.env.VITE_API_URL}/artists?sort=artworks&limit=3`
           ),
         ]);
 

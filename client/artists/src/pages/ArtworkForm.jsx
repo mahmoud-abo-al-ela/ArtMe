@@ -40,7 +40,7 @@ function ArtworkForm({ user }) {
       if (id) {
         try {
           const res = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/artworks/${id}`,
+            `${import.meta.env.VITE_API_URL}/artworks/${id}`,
             {
               headers: { Authorization: `Bearer ${user.token}` },
             }
@@ -125,7 +125,7 @@ function ArtworkForm({ user }) {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
       formDataToSend.append("category", formData.category);
-      formDataToSend.append("isForSale", formData.isForSale);
+      formDataToSend.append("isForSale", String(formData.isForSale));
       if (formData.description) {
         formDataToSend.append("description", formData.description);
       }
@@ -135,11 +135,13 @@ function ArtworkForm({ user }) {
       if (image) {
         formDataToSend.append("image", image);
       }
+      // Add artist ID explicitly
+      formDataToSend.append("artist", user.id);
 
       let response;
       if (id) {
         response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/api/artworks/${id}`,
+          `${import.meta.env.VITE_API_URL}/artworks/${id}`,
           formDataToSend,
           {
             headers: {
@@ -150,7 +152,7 @@ function ArtworkForm({ user }) {
         );
       } else {
         response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/artworks`,
+          `${import.meta.env.VITE_API_URL}/artworks`,
           formDataToSend,
           {
             headers: {

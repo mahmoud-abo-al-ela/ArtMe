@@ -10,7 +10,7 @@ const User = require("../models/User");
 
 // Create Artwork (Artist only)
 router.post("/", auth, upload.single("image"), async (req, res) => {
-  const { title, description, category, isForSale, price } = req.body;
+  const { title, description, category, isForSale, price, artist } = req.body;
 
   try {
     // Validate input
@@ -26,13 +26,16 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       req.file.buffer
     );
 
+    // Get artist ID either from request body or from auth token
+    const artistId = artist || req.user.id;
+
     const artwork = new Artwork({
       title,
       description,
       imageUrl,
       images: [imageUrl],
       category,
-      artist: req.user.id,
+      artist: artistId,
       isForSale: isForSale === "true", // FormData sends boolean as string
       price: isForSale === "true" ? price : undefined,
     });
@@ -40,7 +43,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     await artwork.save();
 
     // Update the user's artworks array with the new artwork ID
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(artistId, {
       $push: { artworks: artwork._id },
     });
 
@@ -54,9 +57,17 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 // Get All Artworks (Public)
 router.get("/", async (req, res) => {
   try {
-    const { limit } = req.query;
+    const { limit, artist } = req.query;
 
-    const query = Artwork.find()
+    // Build query object based on parameters
+    const queryOptions = {};
+
+    // Add artist filter if provided
+    if (artist) {
+      queryOptions.artist = artist;
+    }
+
+    const query = Artwork.find(queryOptions)
       .populate("artist", "name")
       .sort({ createdAt: -1 });
 
@@ -87,12 +98,21 @@ router.get("/:id", async (req, res) => {
 
 // Update Artwork (Artist only)
 router.put("/:id", auth, upload.single("image"), async (req, res) => {
-  const { title, description, category, isForSale, price } = req.body;
+  const { title, description, category, isForSale, price, artist } = req.body;
   try {
     const artwork = await Artwork.findById(req.params.id);
     if (!artwork) return res.status(404).json({ message: "Artwork not found" });
-    if (artwork.artist.toString() !== req.user.id)
+
+    // Get artist ID from request body or auth token
+    const artistId = artist || req.user.id;
+
+    // Check if the user is authorized to update this artwork
+    if (
+      artwork.artist.toString() !== artistId &&
+      artwork.artist.toString() !== req.user.id
+    ) {
       return res.status(403).json({ message: "Not authorized" });
+    }
 
     let imageUrl = artwork.imageUrl;
     if (req.file) {

@@ -26,7 +26,18 @@ module.exports = (req, res, next) => {
       res.set("X-Token-Expires-In", timeUntilExpiry.toString());
     }
 
-    req.user = decoded;
+    // Normalize user object structure for consistent access
+    if (decoded.user && decoded.user.id) {
+      // If user is nested in decoded object
+      req.user = decoded.user;
+    } else if (decoded.id) {
+      // If id is directly on decoded object
+      req.user = { id: decoded.id };
+    } else {
+      // Default to original structure
+      req.user = decoded;
+    }
+
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

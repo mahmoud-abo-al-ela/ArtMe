@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "../utils/api";
-import { FiRefreshCw } from "react-icons/fi";
 
 // Import common components
-import LoadingScreen from "../components/dashboard/LoadingScreen";
+import LoadingScreen from "../components/common/LoadingScreen";
 import EmptyState from "../components/common/EmptyState";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 
@@ -248,7 +247,7 @@ const Artworks = () => {
   };
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen msg="artworks" />;
   }
 
   if (error) {

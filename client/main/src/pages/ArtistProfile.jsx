@@ -11,25 +11,10 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import LoadingSpinner from "../components/LoadingSpinner";
 import ArtworkCard from "../components/ArtworkCard";
 import FullImageView from "../components/FullImageView";
 import Pagination from "../components/Pagination";
 import { getArtistByName } from "../services/artistService";
-
-const StatCard = ({ icon, value, label, className }) => (
-  <motion.div
-    className={`bg-white p-4 rounded-xl shadow-md flex items-center gap-3 ${className}`}
-    whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
-    transition={{ duration: 0.2 }}
-  >
-    <div className="p-2 rounded-full bg-indigo-50 text-indigo-600">{icon}</div>
-    <div>
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
-      <p className="text-sm text-gray-500">{label}</p>
-    </div>
-  </motion.div>
-);
 
 function ArtistProfile() {
   const { name } = useParams();
@@ -303,9 +288,11 @@ function ArtistProfile() {
 
   if (!artist) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">Artist Not Found</h2>
-        <p className="mb-8">
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center mt-15">
+        <h2 className="text-3xl font-bold mb-4 text-indigo-600">
+          Artist Not Found
+        </h2>
+        <p className="mb-8 text-indigo-600">
           The artist you're looking for doesn't exist or has been removed.
         </p>
         <Link

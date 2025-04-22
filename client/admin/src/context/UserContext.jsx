@@ -11,7 +11,6 @@ export const UserProvider = ({ children }) => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
   const [actionInProgress, setActionInProgress] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState("name");
@@ -72,7 +71,6 @@ export const UserProvider = ({ children }) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      setRefreshing(true);
       const response = await api.get("/admin/users");
       setUsers(response.data);
       setFilteredUsers(response.data);
@@ -83,7 +81,6 @@ export const UserProvider = ({ children }) => {
       toast.error("Failed to load users. Please try again.");
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
@@ -155,7 +152,7 @@ export const UserProvider = ({ children }) => {
       const updatedUsers = users.filter((user) => user._id !== userId);
       setUsers(updatedUsers);
 
-      toast.success("User deleted successfully");
+      toast.success("User and all associated artworks deleted successfully");
       return true;
     } catch (err) {
       toast.error("Failed to delete user");
@@ -188,8 +185,8 @@ export const UserProvider = ({ children }) => {
 
       // Update toast to success
       toast.update(loadingToastId, {
-        render: `${userIds.length} users deleted successfully`,
-        type: toast.TYPE.SUCCESS,
+        render: `${userIds.length} users and their artworks deleted successfully`,
+        type: "success",
         isLoading: false,
         autoClose: 3000,
       });
@@ -288,7 +285,6 @@ export const UserProvider = ({ children }) => {
         paginatedUsers,
         loading,
         error,
-        refreshing,
         actionInProgress,
         searchQuery,
         setSearchQuery,

@@ -3,7 +3,7 @@ import UserList from "../components/users/UserList";
 import UserEditModal from "../components/users/UserEditModal";
 import UserDeleteConfirmation from "../components/users/UserDeleteConfirmation";
 import LoadingOverlay from "../components/common/LoadingOverlay";
-import LoadingScreen from "../components/dashboard/LoadingScreen";
+import LoadingScreen from "../components/common/LoadingScreen";
 import UserHeader from "../components/users/UserHeader";
 import UserSearch from "../components/users/UserSearch";
 import SearchResults from "../components/users/SearchResults";
@@ -16,7 +16,6 @@ const Users = () => {
     paginatedUsers,
     loading,
     error,
-    refreshing,
     actionInProgress,
     searchQuery,
     setSearchQuery,
@@ -30,7 +29,6 @@ const Users = () => {
     filteredUsers,
     isFilterMenuOpen,
     setIsFilterMenuOpen,
-    fetchUsers,
     handleRoleChange,
     updateUser,
     deleteUser,
@@ -138,7 +136,7 @@ const Users = () => {
   return (
     <>
       {loading ? (
-        <LoadingScreen />
+        <LoadingScreen msg="users" />
       ) : (
         <LoadingOverlay
           isLoading={actionInProgress}
@@ -146,9 +144,6 @@ const Users = () => {
         >
           <div>
             <UserHeader
-              fetchUsers={fetchUsers}
-              loading={loading}
-              refreshing={refreshing}
               exportUsers={exportUsers}
               handleAddUser={handleAddUser}
               filters={filters}

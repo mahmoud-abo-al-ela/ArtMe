@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  FaSearch,
-  FaTimes,
-  FaSpinner,
-  FaArrowLeft,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { FiInstagram, FiFacebook } from "react-icons/fi";
 import Pagination from "../components/Pagination";
 import { getAllArtists } from "../services/artistService";
@@ -76,26 +70,6 @@ function ArtistList() {
 
   // Pagination logic
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const handleImageLoaded = (artistId) => {
-    setImageLoading((prev) => ({
-      ...prev,
-      [artistId]: false,
-    }));
-  };
-
-  // Check if image is already cached before actual load
-  const checkImageCached = (artistId, imageUrl) => {
-    // If we already checked this image and knew it's loading status
-    if (imagesCache.current.has(artistId)) {
-      return;
-    }
-
-    const img = new Image();
-    img.onload = () => handleImageLoaded(artistId);
-    img.src = imageUrl;
-    imagesCache.current.set(artistId, img);
-  };
 
   // Filter artists based on search term and specialty
   const filteredArtists = artists.filter((artist) =>

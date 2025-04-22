@@ -28,7 +28,7 @@ function Profile({ user }) {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/artists/profile`,
+          `${import.meta.env.VITE_API_URL}/artists/profile`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -113,7 +113,7 @@ function Profile({ user }) {
       };
 
       const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/artists/profile`,
+        `${import.meta.env.VITE_API_URL}/artists/profile`,
         updatedProfile,
         {
           headers: { Authorization: `Bearer ${user.token}` },
@@ -159,7 +159,7 @@ function Profile({ user }) {
       uploadFormData.append("profileImage", image); // image is a File object
 
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/artists/profile/image`,
+        `${import.meta.env.VITE_API_URL}/artists/profile/image`,
         uploadFormData,
         {
           headers: {

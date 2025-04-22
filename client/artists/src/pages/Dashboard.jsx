@@ -32,16 +32,17 @@ function Dashboard({ user }) {
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
+        // Extract user ID from the user object, handling both direct and nested structures
+        const userId = user.id || (user.user && user.user.id);
+
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/artworks`,
+          `${import.meta.env.VITE_API_URL}/artworks?artist=${userId}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        const userArtworks = res.data.filter(
-          (artwork) => artwork.artist._id === user.id
-        );
-        setArtworks(userArtworks);
+
+        setArtworks(res.data);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -62,7 +63,7 @@ function Dashboard({ user }) {
   const handleDelete = async (id) => {
     try {
       setDeletingArtwork(id);
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/artworks/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/artworks/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 

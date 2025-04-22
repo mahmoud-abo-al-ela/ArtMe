@@ -17,12 +17,14 @@ const UserTableRow = ({
     >
       {onSelect && (
         <td className="px-3 py-4">
-          <input
-            type="checkbox"
-            className="h-4 w-4 text-gray-700 border-gray-300 rounded focus:ring-gray-700"
-            checked={isSelected}
-            onChange={onSelect}
-          />
+          {user.role !== "admin" && (
+            <input
+              type="checkbox"
+              className="h-4 w-4 text-gray-700 border-gray-300 rounded focus:ring-gray-700"
+              checked={isSelected}
+              onChange={onSelect}
+            />
+          )}
         </td>
       )}
       <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -39,23 +41,16 @@ const UserTableRow = ({
             </div>
           )}
           <div>
-            <span className="font-medium block">{user.name || "No Name"}</span>
+            <span className="font-medium block capitalize">{user.name}</span>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
-        <a
-          href={`mailto:${user.email}`}
-          className="hover:text-primary hover:underline"
-        >
-          {user.email || "No Email"}
-        </a>
-      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm">{user.email}</td>
       <td className="px-6 py-4 whitespace-nowrap text-sm capitalize">
-        {user.role || "No Role"}
+        {user.role}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm">
-        {user.createdAt ? formatDate(user.createdAt) : "Unknown"}
+        {formatDate(user.createdAt)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm">
         <div className="flex space-x-2">

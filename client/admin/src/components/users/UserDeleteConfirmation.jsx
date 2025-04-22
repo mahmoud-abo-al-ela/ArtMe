@@ -8,7 +8,7 @@ const UserDeleteConfirmation = ({ isOpen, onClose, onConfirm, userName }) => {
       onClose={onClose}
       onConfirm={onConfirm}
       title="Delete User"
-      message={`Are you sure you want to delete ${userName}? This action cannot be undone.`}
+      message={`Are you sure you want to delete ${userName}? All artworks created by this user will also be permanently deleted. This action cannot be undone.`}
       confirmText="Delete"
       confirmButtonType="danger"
       type="error"

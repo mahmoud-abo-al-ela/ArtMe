@@ -13,7 +13,7 @@ import StatsCard from "../components/dashboard/StatsCard";
 import StatusCard from "../components/dashboard/StatusCard";
 import TopCategories from "../components/dashboard/TopCategories";
 import ActivityTable from "../components/dashboard/ActivityTable";
-import LoadingScreen from "../components/dashboard/LoadingScreen";
+import LoadingScreen from "../components/common/LoadingScreen";
 import NotificationSystem from "../components/dashboard/NotificationSystem";
 
 const Dashboard = () => {
@@ -193,7 +193,7 @@ const Dashboard = () => {
   }, [fetchDashboardData]);
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen msg="dashboard" />;
   }
 
   return (

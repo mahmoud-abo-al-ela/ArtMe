@@ -11,7 +11,7 @@ const UserFilter = ({
     <div className="relative">
       <button
         onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-        className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+        className="cursor-pointer flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
         title="Filter users"
         aria-label="Open filter menu"
         aria-expanded={isFilterMenuOpen}

@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  FaSearch,
-  FaFilter,
-  FaSort,
-  FaChevronDown,
-  FaArrowLeft,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaSearch, FaFilter, FaSort, FaChevronDown } from "react-icons/fa";
 import FullImageView from "../components/FullImageView";
 import ArtworkCard from "../components/ArtworkCard";
 import Pagination from "../components/Pagination";
@@ -54,9 +47,7 @@ function Gallery() {
     const fetchArtworks = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/artworks`
-        );
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/artworks`);
         setArtworks(res.data);
         setFilteredArtworks(res.data);
 
