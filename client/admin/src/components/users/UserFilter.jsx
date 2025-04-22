@@ -32,7 +32,7 @@ const UserFilter = ({
               <h3 className="font-medium text-sm text-gray-700">Filters</h3>
               <button
                 onClick={() => setIsFilterMenuOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="cursor-pointer text-gray-400 hover:text-gray-600"
                 aria-label="Close filter menu"
               >
                 <FiX size={16} />
@@ -63,17 +63,10 @@ const UserFilter = ({
             <div className="flex justify-between mt-3">
               <button
                 onClick={() => setFilters({ role: "all" })}
-                className="text-xs text-gray-600 hover:text-primary"
+                className="cursor-pointer text-xs text-gray-600 hover:text-gray-800"
                 aria-label="Reset filters"
               >
                 Reset
-              </button>
-              <button
-                onClick={() => setIsFilterMenuOpen(false)}
-                className="text-xs bg-primary text-white px-2 py-1 rounded hover:bg-primary-dark"
-                aria-label="Apply filters"
-              >
-                Apply
               </button>
             </div>
           </div>

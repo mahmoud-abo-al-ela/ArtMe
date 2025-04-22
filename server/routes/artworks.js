@@ -120,18 +120,33 @@ router.put("/:id", auth, upload.single("image"), async (req, res) => {
   }
 });
 
-// Delete Artwork (Artist only)
+// Delete Artwork (Artist only or Admin)
 router.delete("/:id", auth, async (req, res) => {
   try {
     const artwork = await Artwork.findById(req.params.id);
     if (!artwork) return res.status(404).json({ message: "Artwork not found" });
-    if (artwork.artist.toString() !== req.user.id)
-      return res.status(403).json({ message: "Not authorized" });
 
-    await artwork.deleteOne({ _id: req.params.id });
+    // Extract userId from token - JWT payload has nested user object
+    const userId = req.user.id || (req.user.user && req.user.user.id);
+
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid user token structure" });
+    }
+
+    // Check if user is admin (role check)
+    const user = await User.findById(userId);
+
+    const isAdmin = user && user.role === "admin";
+
+    // If not admin, check if user is the artist
+    if (!isAdmin && artwork.artist.toString() !== userId) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await Artwork.deleteOne({ _id: req.params.id });
 
     // Remove artwork from user's artworks array
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(artwork.artist, {
       $pull: { artworks: req.params.id },
     });
 

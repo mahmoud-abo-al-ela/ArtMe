@@ -3,6 +3,7 @@ import UserList from "../components/users/UserList";
 import UserEditModal from "../components/users/UserEditModal";
 import UserDeleteConfirmation from "../components/users/UserDeleteConfirmation";
 import LoadingOverlay from "../components/common/LoadingOverlay";
+import LoadingScreen from "../components/dashboard/LoadingScreen";
 import UserHeader from "../components/users/UserHeader";
 import UserSearch from "../components/users/UserSearch";
 import SearchResults from "../components/users/SearchResults";
@@ -135,83 +136,92 @@ const Users = () => {
   };
 
   return (
-    <LoadingOverlay isLoading={actionInProgress} message="Processing action...">
-      <div>
-        <UserHeader
-          fetchUsers={fetchUsers}
-          loading={loading}
-          refreshing={refreshing}
-          exportUsers={exportUsers}
-          handleAddUser={handleAddUser}
-          filters={filters}
-          setFilters={setFilters}
-          isFilterMenuOpen={isFilterMenuOpen}
-          setIsFilterMenuOpen={setIsFilterMenuOpen}
-        />
+    <>
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <LoadingOverlay
+          isLoading={actionInProgress}
+          message="Processing action..."
+        >
+          <div>
+            <UserHeader
+              fetchUsers={fetchUsers}
+              loading={loading}
+              refreshing={refreshing}
+              exportUsers={exportUsers}
+              handleAddUser={handleAddUser}
+              filters={filters}
+              setFilters={setFilters}
+              isFilterMenuOpen={isFilterMenuOpen}
+              setIsFilterMenuOpen={setIsFilterMenuOpen}
+            />
 
-        <div className="bg-white p-4 rounded-lg shadow mb-6">
-          <UserSearch
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            handleSearch={handleSearch}
-            handleClearSearch={handleClearSearch}
-          />
+            <div className="bg-white p-4 rounded-lg shadow mb-6">
+              <UserSearch
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                handleSearch={handleSearch}
+                handleClearSearch={handleClearSearch}
+              />
 
-          <SearchResults
-            searchQuery={searchQuery}
-            filteredUsers={filteredUsers}
-          />
+              <SearchResults
+                searchQuery={searchQuery}
+                filteredUsers={filteredUsers}
+              />
 
-          <BulkActionsBar
-            selectedUsers={selectedUsers}
-            handleBulkDelete={handleBulkDelete}
-          />
+              <BulkActionsBar
+                selectedUsers={selectedUsers}
+                handleBulkDelete={handleBulkDelete}
+              />
 
-          <UserList
-            users={paginatedUsers}
-            loading={loading}
-            error={error}
-            onRoleChange={handleRoleChange}
-            onDelete={handleDeleteUser}
-            onEdit={handleEditUser}
-            onSort={handleSortChange}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            selectedUsers={selectedUsers}
-            onSelectUser={handleSelectUser}
-            onSelectAll={handleSelectAllUsers}
-          />
+              <UserList
+                users={paginatedUsers}
+                loading={loading}
+                error={error}
+                onRoleChange={handleRoleChange}
+                onDelete={handleDeleteUser}
+                onEdit={handleEditUser}
+                onSort={handleSortChange}
+                sortField={sortField}
+                sortDirection={sortDirection}
+                selectedUsers={selectedUsers}
+                onSelectUser={handleSelectUser}
+                onSelectAll={handleSelectAllUsers}
+              />
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            paginate={paginate}
-            indexOfFirstUser={indexOfFirstUser}
-            indexOfLastUser={indexOfLastUser}
-            filteredUsersLength={filteredUsers.length}
-          />
-        </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                paginate={paginate}
+                indexOfFirstUser={indexOfFirstUser}
+                indexOfLastUser={indexOfLastUser}
+                filteredUsersLength={filteredUsers.length}
+              />
+            </div>
 
-        {isEditModalOpen && (
-          <UserEditModal
-            user={editUser}
-            onClose={closeEditModal}
-            onSave={handleSaveUser}
-          />
-        )}
+            {isEditModalOpen && (
+              <UserEditModal
+                user={editUser}
+                onClose={closeEditModal}
+                onSave={handleSaveUser}
+              />
+            )}
 
-        <UserDeleteConfirmation
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-          onConfirm={
-            Array.isArray(userToDelete?._id)
-              ? confirmBulkDelete
-              : confirmDeleteUser
-          }
-          userName={userToDelete?.name || "this user"}
-        />
-      </div>
-    </LoadingOverlay>
+            <UserDeleteConfirmation
+              isOpen={isDeleteModalOpen}
+              onClose={closeDeleteModal}
+              onConfirm={
+                Array.isArray(userToDelete?._id)
+                  ? confirmBulkDelete
+                  : confirmDeleteUser
+              }
+              userName={userToDelete?.name || "this user"}
+            />
+          </div>
+        </LoadingOverlay>
+      )}
+    </>
   );
 };
 

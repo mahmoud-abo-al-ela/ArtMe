@@ -1,6 +1,6 @@
 import React from "react";
 import UserTableRow from "./UserTableRow";
-import Loading from "../common/Loading";
+import LoadingScreen from "../dashboard/LoadingScreen";
 import ErrorMessage from "../common/ErrorMessage";
 import EmptyState from "../common/EmptyState";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
@@ -20,7 +20,7 @@ const UserList = ({
   onSelectAll,
 }) => {
   if (loading) {
-    return <Loading message="Loading users..." />;
+    return <LoadingScreen />;
   }
 
   if (error) {

@@ -1,5 +1,5 @@
 import React from "react";
-import ConfirmationDialog from "../common/ConfirmationDialog";
+import ConfirmationDialog from "../common/ConfirmDialog";
 
 const UserDeleteConfirmation = ({ isOpen, onClose, onConfirm, userName }) => {
   return (
