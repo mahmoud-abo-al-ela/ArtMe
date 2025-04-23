@@ -6,7 +6,6 @@ import LoadingOverlay from "../components/common/LoadingOverlay";
 import LoadingScreen from "../components/common/LoadingScreen";
 import UserHeader from "../components/users/UserHeader";
 import UserSearch from "../components/users/UserSearch";
-import SearchResults from "../components/users/SearchResults";
 import BulkActionsBar from "../components/users/BulkActionsBar";
 import Pagination from "../components/users/Pagination";
 import { useUsers } from "../context/UserContext";
@@ -31,6 +30,7 @@ const Users = () => {
     setIsFilterMenuOpen,
     handleRoleChange,
     updateUser,
+    createUser,
     deleteUser,
     bulkDeleteUsers,
     exportUsers,
@@ -70,7 +70,16 @@ const Users = () => {
   };
 
   const handleSaveUser = async (userData) => {
-    const success = await updateUser(userData);
+    let success;
+
+    if (userData._id) {
+      // Update existing user
+      success = await updateUser(userData);
+    } else {
+      // Create new user
+      success = await createUser(userData);
+    }
+
     if (success) {
       closeEditModal();
     }
@@ -133,6 +142,18 @@ const Users = () => {
     setIsEditModalOpen(true);
   };
 
+  // Inline search results component
+  const SearchResults = () => {
+    if (!searchQuery) return null;
+
+    return (
+      <div className="mb-4 text-sm text-gray-500" aria-live="polite">
+        Found {filteredUsers.length} user
+        {filteredUsers.length !== 1 ? "s" : ""} matching "{searchQuery}"
+      </div>
+    );
+  };
+
   return (
     <>
       {loading ? (
@@ -142,7 +163,7 @@ const Users = () => {
           isLoading={actionInProgress}
           message="Processing action..."
         >
-          <div>
+          <div className="px-2 sm:px-4 md:px-6 max-w-screen-2xl mx-auto">
             <UserHeader
               exportUsers={exportUsers}
               handleAddUser={handleAddUser}
@@ -152,7 +173,7 @@ const Users = () => {
               setIsFilterMenuOpen={setIsFilterMenuOpen}
             />
 
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <div className="bg-white p-2 sm:p-4 rounded-lg shadow mb-6 overflow-hidden">
               <UserSearch
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -160,30 +181,33 @@ const Users = () => {
                 handleClearSearch={handleClearSearch}
               />
 
-              <SearchResults
-                searchQuery={searchQuery}
-                filteredUsers={filteredUsers}
-              />
+              <SearchResults />
 
               <BulkActionsBar
                 selectedUsers={selectedUsers}
                 handleBulkDelete={handleBulkDelete}
               />
 
-              <UserList
-                users={paginatedUsers}
-                loading={loading}
-                error={error}
-                onRoleChange={handleRoleChange}
-                onDelete={handleDeleteUser}
-                onEdit={handleEditUser}
-                onSort={handleSortChange}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                selectedUsers={selectedUsers}
-                onSelectUser={handleSelectUser}
-                onSelectAll={handleSelectAllUsers}
-              />
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <UserList
+                  users={paginatedUsers}
+                  loading={loading}
+                  error={error}
+                  onRoleChange={handleRoleChange}
+                  onDelete={handleDeleteUser}
+                  onEdit={handleEditUser}
+                  onSort={handleSortChange}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  selectedUsers={selectedUsers}
+                  onSelectUser={handleSelectUser}
+                  onSelectAll={handleSelectAllUsers}
+                  filters={filters}
+                  setFilters={setFilters}
+                  isFilterMenuOpen={isFilterMenuOpen}
+                  setIsFilterMenuOpen={setIsFilterMenuOpen}
+                />
+              </div>
 
               <Pagination
                 currentPage={currentPage}

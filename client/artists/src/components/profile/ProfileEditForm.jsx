@@ -21,12 +21,12 @@ function ProfileEditForm({
       onSubmit={handleSubmit}
       className="bg-white rounded-xl shadow-lg overflow-hidden"
     >
-      <div className="p-6 sm:p-8 border-b border-gray-100">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">
+      <div className="p-4 sm:p-6 md:p-8 border-b border-gray-100">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">
           Personal Information
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Image upload section */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -50,19 +50,11 @@ function ProfileEditForm({
         </div>
       </div>
 
-      <div className="bg-gray-50 px-6 py-4 sm:px-8 sm:py-6 flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={confirmCancel}
-          className="px-5 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-400 hover:bg-gray-100 transition-colors"
-          disabled={loading || uploading}
-        >
-          Cancel
-        </button>
+      <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-6 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
         <button
           type="submit"
           disabled={loading || uploading}
-          className="px-5 py-3 bg-indigo-600 text-white rounded-lg shadow-sm hover:bg-indigo-700 disabled:bg-indigo-400 font-medium flex items-center justify-center min-w-[120px] transition-colors"
+          className="px-4 py-2 sm:px-5 sm:py-3 bg-indigo-600 text-white rounded-lg shadow-sm hover:bg-indigo-700 disabled:bg-indigo-400 font-medium flex items-center justify-center min-w-[100px] sm:min-w-[120px] transition-colors w-full sm:w-auto"
         >
           {loading || uploading ? (
             <>
@@ -72,6 +64,14 @@ function ProfileEditForm({
           ) : (
             "Save Profile"
           )}
+        </button>
+        <button
+          type="button"
+          onClick={confirmCancel}
+          className="px-4 py-2 sm:px-5 sm:py-3 border border-gray-300 rounded-lg shadow-sm text-sm sm:text-base font-medium text-gray-400 hover:bg-gray-100 transition-colors w-full sm:w-auto"
+          disabled={loading || uploading}
+        >
+          Cancel
         </button>
       </div>
     </form>

@@ -47,8 +47,8 @@ const ArtworksFilters = ({
   };
 
   return (
-    <div className="mb-6 bg-white p-4 rounded-lg shadow">
-      <div className="flex items-center space-x-3">
+    <div className="mb-4 sm:mb-6 bg-white p-3 sm:p-4 rounded-lg shadow">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:items-center sm:space-x-3">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />
@@ -57,7 +57,7 @@ const ArtworksFilters = ({
             id="search-input"
             ref={searchInputRef}
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary focus:border-primary"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary focus:border-primary text-sm"
             placeholder="Search by title, artist, or description..."
             onChange={handleSearchChange}
             aria-label="Search artworks"
@@ -67,20 +67,20 @@ const ArtworksFilters = ({
         <div className="relative">
           <button
             onClick={() => setFilterOpen(!filterOpen)}
-            className="flex items-center px-3 cursor-pointer py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+            className="w-full sm:w-auto flex items-center justify-center px-3 cursor-pointer py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
             title="Filter artworks"
             aria-label="Open filter menu"
             aria-expanded={filterOpen}
             aria-controls="filter-menu"
           >
             <FiFilter className="mr-1" size={16} />
-            <span className="hidden sm:inline">Filter</span>
+            <span>Filter</span>
           </button>
 
           {filterOpen && (
             <div
               id="filter-menu"
-              className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 border border-gray-200"
+              className="absolute right-0 sm:right-0 mt-2 w-full sm:w-64 bg-white rounded-md shadow-lg z-10 border border-gray-200"
               role="menu"
             >
               <div className="p-3">

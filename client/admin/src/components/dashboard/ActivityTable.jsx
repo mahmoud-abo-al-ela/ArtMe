@@ -7,6 +7,7 @@ import {
   FiImage,
   FiClock,
   FiRefreshCw,
+  FiFilter,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,11 +20,12 @@ const ActivityTable = ({
   formatDate,
   onRefresh,
   refreshing,
+  isMobile,
 }) => {
   return (
     <motion.div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div
-        className={`flex justify-between items-center p-4 border-b cursor-pointer ${
+        className={`flex justify-between items-center p-3 md:p-4 border-b cursor-pointer ${
           minimized ? "border-b-0" : ""
         }`}
         onClick={() => setMinimized(!minimized)}
@@ -32,35 +34,76 @@ const ActivityTable = ({
       >
         <div className="flex items-center">
           <FiActivity className="text-gray-500 mr-2" />
-          <h3 className="text-lg font-medium text-gray-800">Recent Activity</h3>
+          <h3 className="text-md md:text-lg font-medium text-gray-800">
+            Recent Activity
+          </h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           {/* Activity Filter */}
           <div
-            className="flex items-center mr-2 cursor-pointer bg-gray-100 rounded-md p-1"
+            className="flex items-center cursor-pointer bg-gray-100 rounded-md p-1"
             onClick={(e) => e.stopPropagation()}
           >
-            <select
-              className="text-xs rounded-md py-1 pr-8 pl-3 text-gray-700 focus:outline-none"
-              onChange={(e) => setActivityFilter(e.target.value)}
-              value={activityFilter}
-            >
-              <option value="all">All Activity</option>
-              <option value="user">User Activity</option>
-              <option value="artwork">Artwork Activity</option>
-            </select>
+            {isMobile ? (
+              <div className="relative">
+                <button
+                  className="flex items-center text-xs py-1 px-2 text-gray-700"
+                  onClick={() =>
+                    document.getElementById("activity-filter").click()
+                  }
+                >
+                  <FiFilter className="mr-1" />
+                  <select
+                    id="activity-filter"
+                    className="absolute inset-0 opacity-0 w-full cursor-pointer"
+                    onChange={(e) => setActivityFilter(e.target.value)}
+                    value={activityFilter}
+                  >
+                    <option value="all">All</option>
+                    <option value="user">User</option>
+                    <option value="artwork">Artwork</option>
+                  </select>
+                </button>
+              </div>
+            ) : (
+              <select
+                className="text-xs rounded-md py-1 pr-8 pl-3 text-gray-700 focus:outline-none"
+                onChange={(e) => setActivityFilter(e.target.value)}
+                value={activityFilter}
+              >
+                <option value="all">All Activity</option>
+                <option value="user">User Activity</option>
+                <option value="artwork">Artwork Activity</option>
+              </select>
+            )}
           </div>
 
-          <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-            {activities.length} entries
-          </span>
-          {activities.length > 0 && (
+          {!isMobile && (
+            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+              {activities.length} entries
+            </span>
+          )}
+
+          {!isMobile && activities.length > 0 && (
             <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
               Latest: {formatDate(new Date(activities[0]?.date).toISOString())}
             </span>
           )}
 
-          <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors ml-2">
+          <button
+            className="p-1 md:p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRefresh();
+            }}
+            disabled={refreshing}
+          >
+            <FiRefreshCw
+              className={`text-gray-500 ${refreshing ? "animate-spin" : ""}`}
+            />
+          </button>
+
+          <button className="p-1 md:p-1.5 hover:bg-gray-100 rounded-md transition-colors">
             {minimized ? (
               <FiChevronDown className="text-gray-500" />
             ) : (
@@ -84,17 +127,18 @@ const ActivityTable = ({
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Action
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          User
+                        <th
+                          className={`${
+                            isMobile ? "md:table-cell" : ""
+                          } px-3 md:px-6 py-2 md:py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider`}
+                        >
+                          Email
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <th className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Status
                         </th>
                       </tr>
                     </thead>
@@ -112,7 +156,7 @@ const ActivityTable = ({
                               <tr className="bg-gray-50">
                                 <td
                                   colSpan="4"
-                                  className="px-6 py-2 text-xs font-medium text-gray-500"
+                                  className="px-3 md:px-6 py-1 md:py-2 text-xs font-medium text-gray-500"
                                 >
                                   {(() => {
                                     const date = new Date(activity.date);
@@ -131,15 +175,14 @@ const ActivityTable = ({
                                     ) {
                                       return "Yesterday";
                                     } else {
-                                      return date.toLocaleDateString(
-                                        undefined,
-                                        {
-                                          weekday: "long",
-                                          year: "numeric",
-                                          month: "long",
-                                          day: "numeric",
-                                        }
-                                      );
+                                      return isMobile
+                                        ? date.toLocaleDateString()
+                                        : date.toLocaleDateString(undefined, {
+                                            weekday: "long",
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                          });
                                     }
                                   })()}
                                 </td>
@@ -156,10 +199,10 @@ const ActivityTable = ({
                               }}
                               className="transition-all cursor-pointer hover:shadow-sm"
                             >
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                              <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-700">
                                 <div className="flex items-center">
                                   <div
-                                    className={`p-2 rounded-lg mr-3 ${
+                                    className={`p-1.5 md:p-2 rounded-lg mr-2 md:mr-3 ${
                                       activity.action.includes("User")
                                         ? "bg-indigo-100"
                                         : activity.action.includes("Artwork")
@@ -177,9 +220,11 @@ const ActivityTable = ({
                                   </div>
                                   <div>
                                     <div className="font-medium">
-                                      {activity.action}
+                                      {isMobile
+                                        ? activity.action.split(" ")[0]
+                                        : activity.action}
                                     </div>
-                                    {activity.details && (
+                                    {activity.details && !isMobile && (
                                       <div className="text-xs text-gray-500 mt-1">
                                         {activity.action.includes("User")
                                           ? activity.details.name
@@ -197,9 +242,13 @@ const ActivityTable = ({
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <td
+                                className={`${
+                                  isMobile ? "md:table-cell" : ""
+                                } px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm font-medium`}
+                              >
                                 <div className="flex items-center">
-                                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 mr-2">
+                                  <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 mr-2">
                                     {activity.user
                                       ? activity.user.charAt(0).toUpperCase()
                                       : "?"}
@@ -209,7 +258,7 @@ const ActivityTable = ({
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
                                 <time
                                   dateTime={activity.date}
                                   className="flex items-center"
@@ -224,19 +273,6 @@ const ActivityTable = ({
                                   )}
                                 </time>
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span
-                                  className={`px-3 py-1.5 text-xs font-medium rounded-full ${
-                                    activity.status === "failed"
-                                      ? "bg-red-100 text-red-800"
-                                      : activity.status === "pending"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                  }`}
-                                >
-                                  {activity.status || "completed"}
-                                </span>
-                              </td>
                             </motion.tr>
                           </React.Fragment>
                         );
@@ -246,21 +282,22 @@ const ActivityTable = ({
 
                   {/* Pagination Controls - For if we had more than shown on the page */}
                   {activities.length > 5 && (
-                    <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div className="px-3 md:px-6 py-2 md:py-3 flex items-center justify-between border-t border-gray-200">
                       <div className="flex-1 flex justify-between items-center">
                         <button
-                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                          disabled={true}
+                          className="relative inline-flex items-center px-2 md:px-4 py-1 md:py-2 border border-gray-300 text-xs md:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-not-allowed opacity-50"
+                          disabled
                         >
                           Previous
                         </button>
-                        <span className="text-sm text-gray-500">
-                          Page <span className="font-medium">1</span> of{" "}
-                          <span className="font-medium">1</span>
-                        </span>
+                        <div className="hidden md:flex">
+                          <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                            Page 1 of 1
+                          </span>
+                        </div>
                         <button
-                          className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                          disabled={true}
+                          className="relative inline-flex items-center px-2 md:px-4 py-1 md:py-2 border border-gray-300 text-xs md:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-not-allowed opacity-50"
+                          disabled
                         >
                           Next
                         </button>
@@ -269,31 +306,23 @@ const ActivityTable = ({
                   )}
                 </>
               ) : (
-                <div className="py-10 text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="p-4 rounded-full bg-gray-100 mb-3">
-                      <FiActivity className="text-3xl text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-1">
-                      No activity yet
-                    </h3>
-                    <p className="text-gray-500 max-w-md mx-auto mb-4">
-                      There's no recent activity to display. New user
-                      registrations and artwork uploads will appear here.
-                    </p>
-                    <button
-                      onClick={onRefresh}
-                      className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
-                      disabled={refreshing}
-                    >
-                      <FiRefreshCw
-                        className={`inline mr-2 ${
-                          refreshing ? "animate-spin" : ""
-                        }`}
-                      />
-                      Refresh Data
-                    </button>
-                  </div>
+                <div className="text-center py-8">
+                  <div className="text-gray-500 mb-2">No activity found</div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRefresh();
+                    }}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  >
+                    <FiRefreshCw
+                      className={`-ml-1 mr-2 h-5 w-5 ${
+                        refreshing ? "animate-spin" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                    Refresh Data
+                  </button>
                 </div>
               )}
             </div>

@@ -2,7 +2,14 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FiHome, FiUsers, FiImage, FiSettings } from "react-icons/fi";
 
-const Sidebar = () => {
+const Sidebar = ({ closeSidebar }) => {
+  const handleNavLinkClick = () => {
+    // Only close sidebar if closeSidebar function exists (mobile view)
+    if (closeSidebar) {
+      closeSidebar();
+    }
+  };
+
   return (
     <aside className="w-64 bg-gray-900 text-white h-screen flex flex-col">
       <div className="p-6 mb-6">
@@ -19,6 +26,7 @@ const Sidebar = () => {
                 }`
               }
               end
+              onClick={handleNavLinkClick}
             >
               <FiHome className="mr-3 text-xl" />
               <span>Dashboard</span>
@@ -32,6 +40,7 @@ const Sidebar = () => {
                   isActive ? "bg-gray-800" : "hover:bg-gray-800/50"
                 }`
               }
+              onClick={handleNavLinkClick}
             >
               <FiUsers className="mr-3 text-xl" />
               <span>Users</span>
@@ -45,22 +54,10 @@ const Sidebar = () => {
                   isActive ? "bg-gray-800" : "hover:bg-gray-800/50"
                 }`
               }
+              onClick={handleNavLinkClick}
             >
               <FiImage className="mr-3 text-xl" />
               <span>Artworks</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/settings"
-              className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-lg transition-colors ${
-                  isActive ? "bg-gray-800" : "hover:bg-gray-800/50"
-                }`
-              }
-            >
-              <FiSettings className="mr-3 text-xl" />
-              <span>Settings</span>
             </NavLink>
           </li>
         </ul>

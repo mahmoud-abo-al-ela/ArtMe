@@ -277,19 +277,28 @@ router.get("/system-status", adminAuth, async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, bio, socialLinks } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
 
-    user = new User({ name, email, password, role });
+    user = new User({
+      name,
+      email,
+      password,
+      role,
+      bio: bio || "",
+      socialLinks: socialLinks || { instagram: "", facebook: "" },
+    });
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    res.status(201).json({ token, user: { id: user._id, name, email } });
+    // Return the complete user object directly (without password)
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    res.status(201).json(userObj);
   } catch (err) {
+    console.error("Error registering user:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

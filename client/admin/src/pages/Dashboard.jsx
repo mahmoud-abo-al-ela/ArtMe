@@ -43,7 +43,18 @@ const Dashboard = () => {
   const [statusMinimized, setStatusMinimized] = useState(false);
   const [recentActivitiesMinimized, setRecentActivitiesMinimized] =
     useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const dashboardRef = useRef(null);
+
+  // Handle resize events to track device type
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Filter activities based on the selected filter
   const filteredActivities = useMemo(() => {
@@ -197,7 +208,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div ref={dashboardRef} className="pb-16 relative">
+    <div ref={dashboardRef} className="pb-16 relative max-w-full">
       {/* Notification System */}
       <NotificationSystem notification={notification} />
 
@@ -209,47 +220,61 @@ const Dashboard = () => {
         onRefreshStatus={fetchSystemStatus}
         refreshing={refreshing}
         statusRefreshing={statusRefreshing}
+        isMobile={isMobile}
       />
 
-      {/* Main Stats Cards */}
-      <StatsCard
-        userCount={stats.userCount}
-        artworkCount={stats.artworkCount}
-        dailyStats={stats.dailyStats}
-      />
-
-      {/* System Status Section */}
-      {stats.systemStatus && (
-        <StatusCard
-          systemStatus={stats.systemStatus}
-          overallStatus={overallStatus}
-          formatDate={formatDate}
-          getTimeSinceUpdate={getTimeSinceUpdate}
-          minimized={statusMinimized}
-          setMinimized={setStatusMinimized}
+      {/* Dashboard Content - Use responsive grid */}
+      <div className="grid grid-cols-1 gap-6">
+        {/* Main Stats Cards */}
+        <StatsCard
+          userCount={stats.userCount}
+          artworkCount={stats.artworkCount}
+          dailyStats={stats.dailyStats}
         />
-      )}
 
-      {/* Top Categories Section */}
-      {stats.topCategories && stats.topCategories.length > 0 && (
-        <TopCategories
-          categories={stats.topCategories}
-          minimized={topCategoriesMinimized}
-          setMinimized={setTopCategoriesMinimized}
-        />
-      )}
+        {/* System Status Section */}
+        {stats.systemStatus && (
+          <StatusCard
+            systemStatus={stats.systemStatus}
+            overallStatus={overallStatus}
+            formatDate={formatDate}
+            getTimeSinceUpdate={getTimeSinceUpdate}
+            minimized={statusMinimized}
+            setMinimized={setStatusMinimized}
+            isMobile={isMobile}
+          />
+        )}
 
-      {/* Recent Activity Table */}
-      <ActivityTable
-        activities={filteredActivities}
-        minimized={recentActivitiesMinimized}
-        setMinimized={setRecentActivitiesMinimized}
-        activityFilter={activityFilter}
-        setActivityFilter={setActivityFilter}
-        formatDate={formatDate}
-        onRefresh={fetchDashboardData}
-        refreshing={refreshing}
-      />
+        {/* Layout for Top Categories and Recent Activity for larger screens */}
+        <div
+          className={`grid grid-cols-1 ${
+            isMobile ? "lg:grid-cols-2" : ""
+          } gap-6`}
+        >
+          {/* Top Categories Section */}
+          {stats.topCategories && stats.topCategories.length > 0 && (
+            <TopCategories
+              categories={stats.topCategories}
+              minimized={topCategoriesMinimized}
+              setMinimized={setTopCategoriesMinimized}
+              isMobile={isMobile}
+            />
+          )}
+
+          {/* Recent Activity Table */}
+          <ActivityTable
+            activities={filteredActivities}
+            minimized={recentActivitiesMinimized}
+            setMinimized={setRecentActivitiesMinimized}
+            activityFilter={activityFilter}
+            setActivityFilter={setActivityFilter}
+            formatDate={formatDate}
+            onRefresh={fetchDashboardData}
+            refreshing={refreshing}
+            isMobile={isMobile}
+          />
+        </div>
+      </div>
     </div>
   );
 };

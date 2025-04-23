@@ -79,10 +79,10 @@ function ProfileImage({
   // View mode
   if (!isEditing) {
     return (
-      <div className="h-40 w-40 mx-auto rounded-full overflow-hidden border-4 border-white shadow-md relative">
+      <div className="h-32 w-32 sm:h-36 sm:w-36 md:h-40 md:w-40 mx-auto rounded-full overflow-hidden border-4 border-white shadow-md relative">
         {isImageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <FaSpinner className="animate-spin text-indigo-600 h-8 w-8" />
+            <FaSpinner className="animate-spin text-indigo-600 h-6 w-6 sm:h-8 sm:w-8" />
           </div>
         )}
         <img
@@ -108,11 +108,11 @@ function ProfileImage({
     <>
       <div className="relative" onDragOver={handleDragOver} onDrop={handleDrop}>
         {previewUrl ? (
-          <div className="mb-4 relative group">
-            <div className="h-40 w-40 mx-auto rounded-full overflow-hidden border-4 border-white shadow-md relative">
+          <div className="mb-2 sm:mb-4 relative group">
+            <div className="h-32 w-32 sm:h-36 sm:w-36 md:h-40 md:w-40 mx-auto rounded-full overflow-hidden border-4 border-white shadow-md relative">
               {isPreviewLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <FaSpinner className="animate-spin text-indigo-600 h-8 w-8" />
+                  <FaSpinner className="animate-spin text-indigo-600 h-6 w-6 sm:h-8 sm:w-8" />
                 </div>
               )}
               <img
@@ -130,7 +130,7 @@ function ProfileImage({
                 onClick={() =>
                   document.getElementById("profile-image-upload").click()
                 }
-                className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 shadow-lg"
+                className="cursor-pointer bg-white text-gray-800 px-3 py-1 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-gray-100 shadow-lg"
               >
                 Change Image
               </div>
@@ -138,15 +138,15 @@ function ProfileImage({
           </div>
         ) : (
           <div
-            className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+            className="mt-1 flex justify-center px-4 py-6 sm:px-6 sm:pt-8 sm:pb-8 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
             onClick={() =>
               document.getElementById("profile-image-upload").click()
             }
           >
-            <div className="space-y-3 text-center">
-              <FaImages className="mx-auto h-16 w-16 text-gray-400" />
+            <div className="space-y-2 sm:space-y-3 text-center">
+              <FaImages className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400" />
               <div>
-                <p className="text-base text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Drag and drop your image here, or click to browse
                 </p>
                 <p className="text-xs text-gray-500 mt-1">

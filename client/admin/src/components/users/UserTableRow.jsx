@@ -16,7 +16,7 @@ const UserTableRow = ({
       } hover:bg-gray-50 transition-colors`}
     >
       {onSelect && (
-        <td className="px-3 py-4">
+        <td className="px-2 sm:px-3 py-2 sm:py-4">
           {user.role !== "admin" && (
             <input
               type="checkbox"
@@ -27,46 +27,50 @@ const UserTableRow = ({
           )}
         </td>
       )}
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
         <div className="flex items-center">
           {user.profileImage ? (
             <img
               src={user.profileImage}
               alt={user.name}
-              className="h-8 w-8 rounded-full mr-2 object-cover"
+              className="h-6 w-6 sm:h-8 sm:w-8 rounded-full mr-1 sm:mr-2 object-cover"
             />
           ) : (
-            <div className="h-8 w-8 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center mr-2">
+            <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center mr-1 sm:mr-2 text-xs sm:text-sm">
               {user.name?.charAt(0).toUpperCase() || "?"}
             </div>
           )}
-          <div>
+          <div className="truncate max-w-[100px] sm:max-w-full">
             <span className="font-medium block capitalize">{user.name}</span>
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">{user.email}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm capitalize">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
+        <div className="truncate max-w-[100px] sm:max-w-full">{user.email}</div>
+      </td>
+      <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm capitalize">
         {user.role}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
+      <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
         {formatDate(user.createdAt)}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
-        <div className="flex space-x-2">
+      <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
+        <div className="flex space-x-1 sm:space-x-2">
           <button
             onClick={() => onEdit(user)}
-            className="cursor-pointer p-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+            className="cursor-pointer p-1 sm:p-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
             title="Edit user"
+            aria-label="Edit user"
           >
-            <FiEdit size={16} />
+            <FiEdit size={14} className="sm:w-4 sm:h-4" />
           </button>
           <button
             onClick={() => onDelete(user._id)}
-            className="cursor-pointer p-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-colors"
+            className="cursor-pointer p-1 sm:p-1.5 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-colors"
             title="Delete user"
+            aria-label="Delete user"
           >
-            <FiTrash2 size={16} />
+            <FiTrash2 size={14} className="sm:w-4 sm:h-4" />
           </button>
         </div>
       </td>

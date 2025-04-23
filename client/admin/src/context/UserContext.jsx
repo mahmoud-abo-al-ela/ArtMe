@@ -129,10 +129,8 @@ export const UserProvider = ({ children }) => {
     try {
       setActionInProgress(true);
       const response = await api.post("/admin/register", userData);
-
       // Add the new user to the users list
       setUsers([...users, response.data]);
-
       toast.success("User created successfully");
       return true;
     } catch (err) {
@@ -270,10 +268,21 @@ export const UserProvider = ({ children }) => {
 
   // Function to handle select all users on current page
   const handleSelectAllUsers = () => {
-    if (selectedUsers.length === paginatedUsers.length) {
+    // Filter out admin users from the selection
+    const selectableUsers = paginatedUsers.filter(
+      (user) => user.role !== "admin"
+    );
+    const selectableUserIds = selectableUsers.map((user) => user._id);
+
+    // Check if all selectable users are already selected
+    const allSelectableUsersSelected = selectableUserIds.every((id) =>
+      selectedUsers.includes(id)
+    );
+
+    if (allSelectableUsersSelected) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(paginatedUsers.map((user) => user._id));
+      setSelectedUsers(selectableUserIds);
     }
   };
 

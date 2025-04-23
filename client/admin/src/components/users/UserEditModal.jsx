@@ -68,6 +68,8 @@ const UserEditModal = ({ user, onClose, onSave }) => {
 
     if (!user && !formData.password.trim()) {
       newErrors.password = "Password is required for new users";
+    } else if (!user && formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
     }
 
     setErrors(newErrors);

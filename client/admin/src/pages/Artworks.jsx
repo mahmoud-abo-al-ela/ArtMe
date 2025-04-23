@@ -215,12 +215,11 @@ const Artworks = () => {
     setIsDeleting(true);
     try {
       // Use Promise.all for parallel requests
-      // Use Promise.all for parallel requests
       const deletePromises = selectedArtworks.map((id) => {
         return api.delete(`/artworks/${id}`);
       });
 
-      const results = await Promise.all(deletePromises);
+      await Promise.all(deletePromises);
 
       setArtworks((prev) =>
         prev.filter((a) => !selectedArtworks.includes(a._id))
@@ -255,10 +254,10 @@ const Artworks = () => {
   }
 
   return (
-    <div>
+    <div className="px-2 sm:px-4">
       {notification && (
         <div
-          className={`fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg ${
+          className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-md shadow-lg text-sm sm:text-base max-w-[90vw] sm:max-w-md ${
             notification.type === "success"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
@@ -268,8 +267,8 @@ const Artworks = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-light">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-semibold text-light mb-3 sm:mb-0">
           Artworks Management
         </h2>
       </div>
@@ -299,7 +298,7 @@ const Artworks = () => {
       <div className="flex items-center mb-2">
         <button
           onClick={toggleSelectMode}
-          className={`cursor-pointer flex items-center px-3 py-2 rounded mr-2 ${
+          className={`cursor-pointer flex items-center px-2 sm:px-3 py-1.5 sm:py-2 rounded mr-2 text-xs sm:text-sm ${
             selectMode
               ? "bg-primary text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -310,7 +309,7 @@ const Artworks = () => {
       </div>
 
       {filteredArtworks.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {filteredArtworks.map((artwork) => (
             <ArtworkCard
               key={artwork._id}

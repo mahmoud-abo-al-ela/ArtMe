@@ -209,9 +209,11 @@ function Profile({ user }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Artist Profile</h1>
+    <div className="max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 mt-10">
+      <div className="flex items-center justify-between mb-4 sm:mb-8">
+        <span className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Artist Profile
+        </span>
       </div>
 
       {!isEditing ? (

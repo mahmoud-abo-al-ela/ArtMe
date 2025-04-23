@@ -31,10 +31,8 @@ export const getArtistByName = async (name) => {
 
     // Ensure social links are properly structured
     const socialLinks = {
-      instagram: artistData.social?.instagram || "",
-      facebook: artistData.social?.facebook || "",
-      twitter: artistData.social?.twitter || "",
-      website: artistData.social?.website || "",
+      instagram: artistData.socialLinks?.instagram || "",
+      facebook: artistData.socialLinks?.facebook || "",
     };
 
     return {

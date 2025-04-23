@@ -82,28 +82,28 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-12 mt-12">
-      <div className="w-full max-w-md">
-        <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+    <div className="flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12 min-h-[80vh]">
+      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
+        <div className="mb-6 sm:mb-8 md:mb-10 text-center">
+          <h1 className=" font-bold text-gray-900 mb-2 sm:mb-3">
             Artist Portal
           </h1>
-          <div className="w-16 h-1 bg-indigo-600 mx-auto rounded-full"></div>
+          <div className="w-12 sm:w-16 h-1 bg-indigo-600 mx-auto rounded-full"></div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+        <div className="bg-white rounded-lg shadow-lg p-5 sm:p-6 md:p-8">
+          <h2 className="text-xl sm:text-2xl text-center font-semibold text-gray-800 mb-4 sm:mb-6">
             Sign in to your account
           </h2>
 
           {error && (
-            <div className="mb-6 px-4 py-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-md flex items-center">
-              <FiAlertCircle className="mr-2 text-red-500" size={18} />
-              <span>{error}</span>
+            <div className="mb-4 sm:mb-6 px-3 sm:px-4 py-2 sm:py-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-md flex items-center">
+              <FiAlertCircle className="mr-2 text-red-500" size={16} />
+              <span className="text-sm sm:text-base">{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
               <label
                 htmlFor="email"
@@ -114,7 +114,7 @@ function Login() {
               <div className="relative">
                 <FiMail
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  size={18}
+                  size={16}
                 />
                 <input
                   type="email"
@@ -123,7 +123,7 @@ function Login() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="text-black w-full pl-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="text-black w-full pl-10 px-1 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base transition-all duration-200 hover:border-indigo-300"
                   placeholder="Your email address"
                 />
               </div>
@@ -139,7 +139,7 @@ function Login() {
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-indigo-600 hover:underline"
+                  className="text-xs sm:text-sm text-indigo-600 hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -147,7 +147,7 @@ function Login() {
               <div className="relative">
                 <FiLock
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  size={18}
+                  size={16}
                 />
                 <input
                   type={showPassword ? "text" : "password"}
@@ -156,7 +156,7 @@ function Login() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="text-black w-full pl-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="text-black w-full pl-11 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base transition-all duration-200 hover:border-indigo-300"
                   placeholder="Your password"
                 />
                 <div
@@ -164,9 +164,9 @@ function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <FiEye className="text-gray-500" size={18} />
+                    <FiEye className="text-gray-500" size={16} />
                   ) : (
-                    <FiEyeOff className="text-gray-500" size={18} />
+                    <FiEyeOff className="text-gray-500" size={16} />
                   )}
                 </div>
               </div>
@@ -175,11 +175,11 @@ function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+              className="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 transition-colors duration-200"
             >
               {loading ? (
                 <span className="flex items-center">
-                  <FiLoader className="animate-spin mr-2" size={18} />
+                  <FiLoader className="animate-spin mr-2" size={16} />
                   Signing in...
                 </span>
               ) : (

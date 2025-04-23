@@ -1,4 +1,5 @@
 import React from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const Pagination = ({
   currentPage,
@@ -12,7 +13,7 @@ const Pagination = ({
 
   return (
     <nav
-      className="flex justify-between items-center mt-4 text-sm"
+      className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 pt-2 border-t text-xs sm:text-sm gap-2"
       aria-label="Pagination"
     >
       <div className="text-gray-600">
@@ -24,10 +25,11 @@ const Pagination = ({
         <button
           onClick={() => paginate(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           aria-label="Previous page"
         >
-          Previous
+          <FiChevronLeft className="sm:mr-1" size={14} />
+          <span className="hidden sm:inline">Previous</span>
         </button>
 
         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -43,11 +45,22 @@ const Pagination = ({
             pageNum = currentPage - 2 + i;
           }
 
+          // On mobile, show only current page and adjacent pages
+          const isMobilePage =
+            window.innerWidth < 640 &&
+            Math.abs(currentPage - pageNum) > 1 &&
+            pageNum !== 1 &&
+            pageNum !== totalPages;
+
+          if (window.innerWidth < 640 && isMobilePage) {
+            return null;
+          }
+
           return (
             <button
               key={pageNum}
               onClick={() => paginate(pageNum)}
-              className={`px-3 py-1 border rounded ${
+              className={`w-8 h-8 sm:px-3 sm:py-1 border rounded flex items-center justify-center ${
                 currentPage === pageNum
                   ? "bg-primary text-white"
                   : "hover:bg-gray-50"
@@ -63,10 +76,11 @@ const Pagination = ({
         <button
           onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 border rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           aria-label="Next page"
         >
-          Next
+          <span className="hidden sm:inline">Next</span>
+          <FiChevronRight className="sm:ml-1" size={14} />
         </button>
       </div>
     </nav>

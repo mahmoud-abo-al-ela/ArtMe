@@ -417,32 +417,6 @@ function ArtistProfile() {
                   <FiFacebook size={20} />
                 </motion.a>
               )}
-              {socialLinks.twitter && (
-                <motion.a
-                  href={socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 hover:text-blue-400 hover:bg-blue-50 transition-all shadow-sm"
-                  aria-label="Twitter"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <FiTwitter size={20} />
-                </motion.a>
-              )}
-              {socialLinks.website && (
-                <motion.a
-                  href={socialLinks.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm"
-                  aria-label="Website"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <FiGlobe size={20} />
-                </motion.a>
-              )}
             </div>
           </div>
         </div>
@@ -623,7 +597,7 @@ function ArtistProfile() {
             )}
           </div>
         ) : (
-          <AnimatePresence>
+          <AnimatePresence key={`${activeFilter}-${activeSortOption}`}>
             <motion.div
               className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-max ${
                 filterApplied || sortApplied ? "animate-pulse" : ""
@@ -632,7 +606,7 @@ function ArtistProfile() {
             >
               {currentArtworks.map((artwork, index) => (
                 <motion.div
-                  key={artwork._id}
+                  key={artwork._id ? artwork._id : `artwork-${index}`}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -657,12 +631,19 @@ function ArtistProfile() {
             </motion.div>
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalItems={filteredArtworks.length}
-              itemsPerPage={artworksPerPage}
-              paginate={paginate}
-            />
+            <motion.div
+              key="pagination"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Pagination
+                currentPage={currentPage}
+                totalItems={filteredArtworks.length}
+                itemsPerPage={artworksPerPage}
+                paginate={paginate}
+              />
+            </motion.div>
           </AnimatePresence>
         )}
       </div>

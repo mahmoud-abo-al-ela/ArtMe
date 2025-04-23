@@ -201,23 +201,23 @@ function Dashboard({ user }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl min-h-[85vh] mx-auto p-4 sm:p-6 lg:p-8 fade-in">
-      <div className="mb-8 relative">
-        <h1 className="text-3xl font-bold text-gray-800 section-title after:content-[''] after:block after:w-24 after:h-1 after:bg-indigo-600 after:mt-2">
+    <div className="max-w-7xl min-h-[85vh] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 fade-in mt-10">
+      <div className="mb-4 sm:mb-6 md:mb-8 relative">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 section-title after:content-[''] after:block after:w-16 sm:after:w-24 after:h-1 after:bg-indigo-600 after:mt-1 sm:after:mt-2">
           Your Creative Journey
-        </h1>
+        </h2>
       </div>
 
       {/* Notification Component */}
       <Notification notification={notification} />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+      <div className="flex flex-col justify-between items-start sm:items-center mb-4 sm:mb-6 md:mb-8">
         {/* Filter Component */}
         <FilterBar
           filter={filter}
@@ -260,7 +260,6 @@ function Dashboard({ user }) {
       )}
 
       {/* Full Image View Component */}
-
       <FullImageView
         fullImage={fullImage}
         closeFullImage={closeFullImage}

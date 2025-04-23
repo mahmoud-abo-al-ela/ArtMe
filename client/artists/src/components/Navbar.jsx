@@ -1,9 +1,46 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
 function Navbar({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close mobile menu when changing routes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        mobileMenuOpen
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [mobileMenuOpen]);
 
   const handleLogout = () => {
     onLogout();
@@ -14,8 +51,26 @@ function Navbar({ user, onLogout }) {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  // Check if the path is active
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  // Handle touch swipe to close menu
+  const handleTouchStart = useRef({ x: 0, y: 0 });
+  const handleTouchMove = (e) => {
+    if (!mobileMenuOpen) return;
+
+    const touchX = e.touches[0].clientX;
+    const deltaX = touchX - handleTouchStart.current.x;
+
+    if (deltaX < -50) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md sticky top-0 z-50">
+    <nav className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -54,7 +109,7 @@ function Navbar({ user, onLogout }) {
               href={import.meta.env.VITE_MAIN_SITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-6 text-gray-600 hover:text-indigo-600 text-sm hidden sm:block"
+              className="ml-6 text-gray-600 hover:text-indigo-600 text-sm hidden sm:block transition-colors duration-200"
             >
               Visit Main Site
             </a>
@@ -66,25 +121,34 @@ function Navbar({ user, onLogout }) {
               <>
                 <Link
                   to="/dashboard"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className={`text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                    isActive("/dashboard") ? "text-indigo-600" : ""
+                  }`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/artwork/new"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className={`text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                    isActive("/artwork/new") ? "text-indigo-600" : ""
+                  }`}
                 >
                   Add Artwork
                 </Link>
                 <Link
                   to="/profile"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className={`text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                    isActive("/profile") ? "text-indigo-600" : ""
+                  }`}
                 >
                   My Profile
                 </Link>
-                <button onClick={handleLogout} className="btn-creative text-sm">
+                <div
+                  onClick={handleLogout}
+                  className="btn-creative text-sm cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                >
                   Logout
-                </button>
+                </div>
               </>
             ) : (
               <></>
@@ -93,12 +157,18 @@ function Navbar({ user, onLogout }) {
 
           {/* Mobile menu button */}
           <div className="sm:hidden flex items-center">
-            <button
+            <div
               onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-indigo-600 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 active:scale-90"
+              aria-expanded={mobileMenuOpen}
+              aria-label="Toggle menu"
             >
               <svg
-                className={`h-6 w-6 ${mobileMenuOpen ? "hidden" : "block"}`}
+                className={`h-6 w-6 transition-all duration-300 ease-in-out ${
+                  mobileMenuOpen
+                    ? "opacity-0 absolute rotate-90"
+                    : "opacity-100 rotate-0"
+                }`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -112,7 +182,11 @@ function Navbar({ user, onLogout }) {
                 />
               </svg>
               <svg
-                className={`h-6 w-6 ${mobileMenuOpen ? "block" : "hidden"}`}
+                className={`h-6 w-6 transition-all duration-300 ease-in-out ${
+                  mobileMenuOpen
+                    ? "opacity-100 rotate-0"
+                    : "opacity-0 absolute -rotate-90"
+                }`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -125,70 +199,270 @@ function Navbar({ user, onLogout }) {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-            </button>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed h-screen inset-0 bg-black opacity-35 backdrop-blur-sm sm:hidden z-40"
+          onClick={() => setMobileMenuOpen(false)}
+          style={{ touchAction: "none" }}
+        ></div>
+      )}
+
       {/* Mobile menu */}
-      <div className={`sm:hidden ${mobileMenuOpen ? "block" : "hidden"}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
+      <div
+        ref={menuRef}
+        onTouchStart={(e) => {
+          handleTouchStart.current = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY,
+          };
+        }}
+        onTouchMove={handleTouchMove}
+        className={`sm:hidden fixed right-0 top-0 w-4/5 max-w-xs h-screen overflow-y-auto bg-white shadow-2xl transform transition-all duration-300 ease-in-out z-50 ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
+          <div className="text-lg font-semibold text-indigo-600">Menu</div>
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 rounded-full hover:bg-gray-100 cursor-pointer"
+          >
+            <svg
+              className="w-6 h-6 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </div>
+        </div>
+        <div className="px-3 py-4 space-y-1">
           {user ? (
             <>
               <Link
                 to="/dashboard"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className={`group flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                  isActive("/dashboard")
+                    ? "bg-indigo-50 text-indigo-600 font-semibold shadow-sm"
+                    : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
+                }`}
               >
-                Dashboard
+                <svg
+                  className={`w-5 h-5 mr-3 transition-colors duration-200 ${
+                    isActive("/dashboard")
+                      ? "text-indigo-600"
+                      : "text-gray-400 group-hover:text-indigo-600"
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h2a1 1 0 001-1v-3m-3-6h-4"
+                  ></path>
+                </svg>
+                <span>Dashboard</span>
+                {isActive("/dashboard") && (
+                  <span className="ml-auto h-2 w-2 rounded-full bg-indigo-600"></span>
+                )}
               </Link>
+
               <Link
                 to="/artwork/new"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className={`group flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                  isActive("/artwork/new")
+                    ? "bg-indigo-50 text-indigo-600 font-semibold shadow-sm"
+                    : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
+                }`}
               >
-                Add Artwork
+                <svg
+                  className={`w-5 h-5 mr-3 transition-colors duration-200 ${
+                    isActive("/artwork/new")
+                      ? "text-indigo-600"
+                      : "text-gray-400 group-hover:text-indigo-600"
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+                <span>Add Artwork</span>
+                {isActive("/artwork/new") && (
+                  <span className="ml-auto h-2 w-2 rounded-full bg-indigo-600"></span>
+                )}
               </Link>
+
               <Link
                 to="/profile"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className={`group flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                  isActive("/profile")
+                    ? "bg-indigo-50 text-indigo-600 font-semibold shadow-sm"
+                    : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
+                }`}
               >
-                My Profile
+                <svg
+                  className={`w-5 h-5 mr-3 transition-colors duration-200 ${
+                    isActive("/profile")
+                      ? "text-indigo-600"
+                      : "text-gray-400 group-hover:text-indigo-600"
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  ></path>
+                </svg>
+                <span>My Profile</span>
+                {isActive("/profile") && (
+                  <span className="ml-auto h-2 w-2 rounded-full bg-indigo-600"></span>
+                )}
               </Link>
-              <button
+
+              <div className="h-px bg-gray-200 my-4"></div>
+
+              <div
                 onClick={handleLogout}
-                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className="group flex w-full items-center px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 cursor-pointer"
               >
-                Logout
-              </button>
+                <svg
+                  className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  ></path>
+                </svg>
+                <span>Logout</span>
+              </div>
+
+              <div className="h-px bg-gray-200 my-4"></div>
+
               <a
                 href={import.meta.env.VITE_MAIN_SITE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className="group flex items-center px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
               >
-                Visit Main Site
+                <svg
+                  className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  ></path>
+                </svg>
+                <span>Visit Main Site</span>
               </a>
             </>
           ) : (
             <>
               <Link
                 to="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className="group flex items-center px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
               >
-                Login
+                <svg
+                  className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  ></path>
+                </svg>
+                <span>Login</span>
               </Link>
+
               <Link
                 to="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className="group flex items-center px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
               >
-                Join Now
+                <svg
+                  className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  ></path>
+                </svg>
+                <span>Register</span>
               </Link>
+
+              <div className="h-px bg-gray-200 my-4"></div>
+
               <a
-                href="https://artportfolio.com"
+                href={import.meta.env.VITE_MAIN_SITE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
+                className="group flex items-center px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
               >
-                Visit Main Site
+                <svg
+                  className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  ></path>
+                </svg>
+                <span>Visit Main Site</span>
               </a>
             </>
           )}
