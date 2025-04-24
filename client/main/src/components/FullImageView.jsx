@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
 import {
-  FaEdit,
-  FaTrash,
   FaTimes,
   FaShare,
   FaDownload,
@@ -40,15 +37,15 @@ const FullImageView = ({
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [scale, setScale] = useState(1);
 
+  // Handle control visibility on movement
   useEffect(() => {
     let timeout;
     const handleMovement = () => {
       setShowControls(true);
       clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
+      timeout = setTimeout(() => setShowControls(false), 3000);
     };
 
     window.addEventListener("mousemove", handleMovement);
@@ -61,23 +58,21 @@ const FullImageView = ({
     };
   }, []);
 
+  // Reset state on image change
   useEffect(() => {
     setImageError(false);
     setIsLoading(true);
+    setScale(1);
   }, [fullImage?._id]);
 
+  // Handle modal focus and escape key
   useEffect(() => {
-    if (modalRef.current) {
-      modalRef.current.focus();
-    }
+    if (modalRef.current) modalRef.current.focus();
 
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        if (showShareOptions) {
-          setShowShareOptions(false);
-        } else {
-          closeFullImage();
-        }
+        if (showShareOptions) setShowShareOptions(false);
+        else closeFullImage();
       }
     };
 
@@ -96,55 +91,39 @@ const FullImageView = ({
       }
     };
 
-    if (showShareOptions) {
+    if (showShareOptions)
       document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showShareOptions]);
 
-  if (!fullImage) return null;
-
+  // Handle image download
   const handleDownload = async () => {
-    if (isDownloading) return; // Prevent multiple clicks
+    if (isDownloading) return;
 
     try {
       setIsDownloading(true);
       setDownloadProgress(10);
 
-      // Fetch the image
       const response = await fetch(fullImage.imageUrl);
-
-      if (!response.ok) {
-        throw new Error("Failed to download image");
-      }
+      if (!response.ok) throw new Error("Failed to download image");
 
       setDownloadProgress(50);
-
-      // Convert to blob
       const blob = await response.blob();
       setDownloadProgress(80);
 
-      // Create object URL
       const url = window.URL.createObjectURL(blob);
-
-      // Create download link
       const link = document.createElement("a");
       link.href = url;
       link.download = `${fullImage.title || "artwork"}.jpg`;
       document.body.appendChild(link);
       link.click();
 
-      // Clean up
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
       setDownloadProgress(100);
       setDownloadSuccess(true);
 
-      // Reset after a delay
       setTimeout(() => {
         setIsDownloading(false);
         setTimeout(() => {
@@ -160,6 +139,7 @@ const FullImageView = ({
     }
   };
 
+  // Handle share link copying
   const handleShareLink = () => {
     navigator.clipboard
       .writeText(window.location.href)
@@ -171,8 +151,8 @@ const FullImageView = ({
     setShowShareOptions(false);
   };
 
+  // Handle share functionality
   const handleShare = () => {
-    // Toggle share options if already open
     if (showShareOptions) {
       setShowShareOptions(false);
       return;
@@ -196,6 +176,7 @@ const FullImageView = ({
     }
   };
 
+  // Handle social media sharing
   const handleSocialShare = (platform) => {
     const url = encodeURIComponent(window.location.href);
     const title = encodeURIComponent(fullImage.title);
@@ -204,7 +185,6 @@ const FullImageView = ({
     );
 
     let shareUrl;
-
     switch (platform) {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
@@ -223,10 +203,46 @@ const FullImageView = ({
     setShowShareOptions(false);
   };
 
+  // Handle touch zoom
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const initialDistance = Math.hypot(
+        touch2.pageX - touch1.pageX,
+        touch2.pageY - touch1.pageY
+      );
+      e.target.dataset.initialDistance = initialDistance;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentDistance = Math.hypot(
+        touch2.pageX - touch1.pageX,
+        touch2.pageY - touch1.pageY
+      );
+      const initialDistance = parseFloat(e.target.dataset.initialDistance);
+      const newScale = Math.min(
+        Math.max(1, (currentDistance / initialDistance) * 1),
+        3
+      );
+      setScale(newScale);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (scale < 1.2) setScale(1);
+  };
+
+  if (!fullImage) return null;
+
   return createPortal(
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex justify-center items-center h-full w-full bg-black/70 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
         onClick={closeFullImage}
         role="dialog"
         aria-labelledby="artwork-title"
@@ -239,40 +255,47 @@ const FullImageView = ({
         transition={{ duration: 0.3 }}
       >
         <motion.div
-          className="relative w-full max-w-7xl max-h-[60vh] flex flex-col md:flex-row bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+          className="relative w-full h-full max-w-[95vw] max-h-[95vh] sm:max-w-4xl md:max-w-6xl lg:max-w-7xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-y-auto flex flex-col md:flex-row"
           onClick={(e) => e.stopPropagation()}
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           transition={{ type: "spring", bounce: 0.3 }}
         >
-          <motion.button
-            className={`absolute top-4 right-4 z-30 w-12 h-12 rounded-full bg-white/95 dark:bg-gray-800/95 flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-all duration-200 shadow-md ${
-              showControls ? "opacity-100" : "opacity-0"
+          {/* Close Button */}
+          <motion.div
+            className={`absolute top-3 right-3 z-30 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 dark:bg-gray-800/90 flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-all shadow-md ${
+              showControls || showShareOptions ? "opacity-100" : "opacity-50"
             }`}
             onClick={closeFullImage}
-            aria-label="Close full image view"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            aria-label="Close image"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            <FaTimes size={24} className="text-gray-800 dark:text-gray-200" />
-          </motion.button>
+            <FaTimes className="text-gray-800 dark:text-gray-200 text-base sm:text-lg" />
+          </motion.div>
 
-          <div className="relative flex-1 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center h-[60vh] w-[60vw] overflow-hidden">
+          {/* Image Section */}
+          <div
+            className="relative flex-1 bg-gray-950 flex items-center justify-center h-[50vh] md:h-auto w-full overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {isLoading && !imageError && (
-              <div className="flex flex-col items-center justify-center h-full w-full bg-gray-950 text-gray-400">
-                <div className="w-16 h-16 border-4 border-t-indigo-500 border-indigo-200/30 rounded-full animate-spin mb-4"></div>
-                <p className="text-lg font-medium text-indigo-300">
-                  Loading artwork...
+              <div className="flex flex-col items-center justify-center h-full w-full text-gray-400">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 border-3 border-t-indigo-500 border-indigo-200/30 rounded-full animate-spin mb-2"></div>
+                <p className="text-sm sm:text-base font-medium text-indigo-300">
+                  Loading...
                 </p>
               </div>
             )}
             {imageError ? (
-              <div className="flex flex-col items-center justify-center h-full w-full bg-gray-950 text-gray-400">
-                <FaTimes size={32} className="text-red-500 mb-3" />
-                <p className="text-lg font-medium">Failed to load image</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  The artwork could not be displayed
+              <div className="flex flex-col items-center justify-center h-full w-full text-gray-400">
+                <FaTimes size={24} className="text-red-500 mb-2" />
+                <p className="text-sm sm:text-base font-medium">
+                  Failed to load image
                 </p>
               </div>
             ) : (
@@ -280,23 +303,16 @@ const FullImageView = ({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{
                   opacity: isLoading ? 0 : 1,
-                  scale: isLoading ? 0.95 : 1,
-                  y: isLoading ? 20 : 0,
+                  scale: isLoading ? 0.95 : scale,
                 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="relative w-full h-full flex items-center justify-center"
               >
                 <img
-                  src={
-                    fullImage.images && fullImage.images.length > 0
-                      ? fullImage.images[0]
-                      : fullImage.imageUrl
-                  }
+                  src={fullImage.images?.[0] || fullImage.imageUrl}
                   alt={`Artwork titled ${fullImage.title}`}
-                  className="max-w-full max-h-full object-contain select-none shadow-2xl"
-                  style={{
-                    filter: "drop-shadow(0 10px 8px rgb(0 0 0 / 0.5))",
-                  }}
+                  className="max-w-full h-full object-contain select-none"
+                  style={{ filter: "drop-shadow(0 8px 6px rgb(0 0 0 / 0.4))" }}
                   onLoad={(e) => {
                     setIsLoading(false);
                     handleImageLoad(fullImage._id);
@@ -310,40 +326,19 @@ const FullImageView = ({
                 />
                 {fullImage.isForSale && fullImage.price && (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.3 }}
-                    className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-2 py-1 rounded-xl shadow-xl border border-white/10 overflow-hidden"
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow:
-                        "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.1)",
-                    }}
+                    className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-lg shadow-lg"
                   >
-                    <motion.div
-                      className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-500/10 to-transparent"
-                      animate={{
-                        x: ["0%", "100%", "0%"],
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    />
-                    <div className="flex items-center gap-3 relative z-10">
-                      <div className="bg-purple-600/30 p-2 rounded-full">
-                        <IoPricetagOutline
-                          className="text-purple-300 flex-shrink-0"
-                          size={24}
-                        />
-                      </div>
-                      <div>
-                        <span className="text-xl font-bold text-white">
-                          {fullImage.price}{" "}
-                          <span className="text-purple-300">EGP</span>
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <IoPricetagOutline
+                        className="text-purple-300"
+                        size={16}
+                      />
+                      <span className="text-sm sm:text-base font-bold text-white">
+                        {fullImage.price}{" "}
+                        <span className="text-purple-300">EGP</span>
+                      </span>
                     </div>
                   </motion.div>
                 )}
@@ -351,55 +346,38 @@ const FullImageView = ({
             )}
           </div>
 
+          {/* Details Section */}
           <motion.div
-            className="w-full md:w-96 bg-white dark:bg-gray-900 p-8 flex flex-col justify-between overflow-y-auto border-l border-gray-200 dark:border-gray-700"
+            className="w-full md:w-80 lg:w-96 bg-white dark:bg-gray-900 p-4 sm:p-6 flex flex-col h-[50%] md:h-full"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
             <div>
-              <div className="flex flex-col justify-between items-start mb-8">
-                <motion.div
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="relative w-full"
-                >
-                  <h1
-                    className="text-4xl font-bold text-gray-800 dark:text-gray-100 capitalize 
-                               hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors
-                               pb-2 relative group"
-                  >
-                    {fullImage.title}
-                    <span
-                      className="absolute bottom-0 left-0 w-0 h-1 bg-indigo-600 dark:bg-indigo-400 
-                                   group-hover:w-full transition-all duration-300 rounded"
-                    ></span>
-                  </h1>
-                </motion.div>
-              </div>
+              <h2
+                className="text-2xl sm:text-3xl lg:text-4xl text-center font-bold text-gray-800 dark:text-gray-100 capitalize mb-4 sm:mb-6"
+                id="artwork-title"
+              >
+                {fullImage.title}
+              </h2>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-5">
                 {fullImage.artist && (
                   <motion.div
+                    className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
-                    className="flex items-center gap-3 flex-wrap p-3 bg-gray-50 dark:bg-gray-800/50 
-                           rounded-lg border-l-4 border-indigo-500 dark:border-indigo-400 
-                           shadow-sm hover:shadow-md transition-all duration-300"
                   >
-                    <div className="bg-indigo-100 dark:bg-indigo-900/70 p-2 rounded-full">
-                      <MdPerson
-                        className="text-indigo-600 dark:text-indigo-400 flex-shrink-0"
-                        size={24}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    <MdPerson
+                      className="text-indigo-600 dark:text-indigo-400"
+                      size={20}
+                    />
+                    <div>
+                      <span className="mr-2 text-xs uppercase text-gray-500 dark:text-gray-400">
                         Artist
                       </span>
-                      <h4 className="text-gray-900 dark:text-gray-200 font-medium">
+                      <h4 className="text-sm sm:text-base inline text-gray-900 dark:text-gray-200">
                         {fullImage.artist.name}
                       </h4>
                     </div>
@@ -407,24 +385,20 @@ const FullImageView = ({
                 )}
 
                 <motion.div
+                  className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                   initial={{ x: -10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.2 }}
-                  className="flex items-center gap-3 flex-wrap p-3 bg-gray-50 dark:bg-gray-800/50 
-                           rounded-lg border-l-4 border-green-500 dark:border-green-400 
-                           shadow-sm hover:shadow-md transition-all duration-300"
                 >
-                  <div className="bg-green-100 dark:bg-green-900/70 p-2 rounded-full">
-                    <MdCategory
-                      className="text-green-600 dark:text-green-400 flex-shrink-0"
-                      size={24}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <MdCategory
+                    className="text-green-600 dark:text-green-400"
+                    size={20}
+                  />
+                  <div>
+                    <span className="mr-2 text-xs uppercase text-gray-500 dark:text-gray-400">
                       Category
                     </span>
-                    <span className="inline-flex items-center rounded-full font-medium">
+                    <span className="text-sm sm:text-base text-gray-900 dark:text-gray-200">
                       {fullImage.category}
                     </span>
                   </div>
@@ -432,70 +406,61 @@ const FullImageView = ({
 
                 {fullImage.description && (
                   <motion.div
+                    className="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
-                    className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 
-                             rounded-lg border-l-4 border-amber-500 dark:border-amber-400 
-                             shadow-sm hover:shadow-md transition-all duration-300"
                   >
-                    <div className="bg-amber-100 dark:bg-amber-900/70 p-2 rounded-full">
+                    <div className="flex items-center gap-3">
                       <MdDescription
-                        className="text-amber-600 dark:text-amber-400 flex-shrink-0"
-                        size={24}
+                        className="text-amber-600 dark:text-amber-400"
+                        size={20}
                       />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      <span className="mr-2 text-xs uppercase text-gray-500 dark:text-gray-400">
                         Description
                       </span>
-
-                      <p
-                        className={`capitalize transition-all duration-300 ${
-                          !isDescriptionExpanded &&
-                          fullImage.description.length > 100
-                            ? "line-clamp-3"
-                            : ""
-                        }`}
-                        id="artwork-description"
-                      >
-                        {fullImage.description}
-                      </p>
                     </div>
+                    <p
+                      className={`text-sm sm:text-base text-gray-900 dark:text-gray-200 ${
+                        !isDescriptionExpanded &&
+                        fullImage.description.length > 100
+                          ? "line-clamp-3"
+                          : ""
+                      }`}
+                      id="artwork-description"
+                    >
+                      {fullImage.description}
+                    </p>
                     {fullImage.description.length > 100 && (
-                      <button
+                      <div
                         onClick={() =>
                           setIsDescriptionExpanded(!isDescriptionExpanded)
                         }
-                        className="text-sm text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 mt-2 hover:underline focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ml-10"
+                        className="text-sm text-amber-600 dark:text-amber-400 hover:underline"
                         aria-controls="artwork-description"
                         aria-expanded={isDescriptionExpanded}
                       >
                         {isDescriptionExpanded ? "Show less" : "Read more"}
-                      </button>
+                      </div>
                     )}
                   </motion.div>
                 )}
 
                 <motion.div
+                  className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
                   initial={{ x: -10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.4 }}
-                  className="flex items-center gap-3 flex-wrap p-3 bg-gray-50 dark:bg-gray-800/50 
-                           rounded-lg border-l-4 border-blue-500 dark:border-blue-400 
-                           shadow-sm hover:shadow-md transition-all duration-300"
                 >
-                  <div className="bg-blue-100 dark:bg-blue-900/70 p-2 rounded-full">
-                    <MdCalendarToday
-                      className="text-blue-600 dark:text-blue-400 flex-shrink-0"
-                      size={24}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <MdCalendarToday
+                    className="text-blue-600 dark:text-blue-400"
+                    size={20}
+                  />
+                  <div>
+                    <span className="mr-2 text-xs uppercase text-gray-500 dark:text-gray-400">
                       Created
                     </span>
-                    <span className="text-gray-900 dark:text-gray-200">
+                    <span className="text-sm sm:text-base text-gray-900 dark:text-gray-200">
                       {new Date(fullImage.createdAt).toLocaleDateString(
                         undefined,
                         {
@@ -510,18 +475,18 @@ const FullImageView = ({
               </div>
             </div>
 
-            <div className="mt-8 flex gap-4">
+            {/* Action Buttons */}
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <motion.div className="relative flex-1">
                 <motion.button
                   onClick={handleShare}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-lg shadow-indigo-500/30 font-medium"
-                  whileHover={{ scale: 1.05, y: -2 }}
+                  className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label="Share artwork"
-                  aria-expanded={showShareOptions}
                 >
-                  <FaShare size={18} />
-                  <span>Share</span>
+                  <FaShare size={16} />
+                  <span className="text-sm sm:text-base">Share</span>
                 </motion.button>
                 <AnimatePresence>
                   {showShareOptions && (
@@ -530,46 +495,46 @@ const FullImageView = ({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-10 w-full"
+                      className="absolute top-full left-0 mt-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10 w-full max-h-60 overflow-y-auto"
                     >
                       <div className="flex flex-col gap-2">
-                        <button
+                        <div
                           onClick={() => handleSocialShare("facebook")}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         >
-                          <FaFacebook size={20} className="text-blue-600" />
-                          <span>Facebook</span>
-                        </button>
-                        <button
+                          <FaFacebook size={18} className="text-blue-600" />
+                          <span className="text-sm">Facebook</span>
+                        </div>
+                        <div
                           onClick={() => handleSocialShare("twitter")}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         >
-                          <FaTwitter size={20} className="text-blue-400" />
-                          <span>Twitter</span>
-                        </button>
-                        <button
+                          <FaTwitter size={18} className="text-blue-400" />
+                          <span className="text-sm">Twitter</span>
+                        </div>
+                        <div
                           onClick={() => handleSocialShare("whatsapp")}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         >
-                          <FaWhatsapp size={20} className="text-green-500" />
-                          <span>WhatsApp</span>
-                        </button>
-                        <button
+                          <FaWhatsapp size={18} className="text-green-500" />
+                          <span className="text-sm">WhatsApp</span>
+                        </div>
+                        <div
                           onClick={handleShareLink}
-                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         >
                           {linkCopied ? (
                             <>
-                              <FaCheck size={20} className="text-green-500" />
-                              <span>Copied!</span>
+                              <FaCheck size={18} className="text-green-500" />
+                              <span className="text-sm">Copied!</span>
                             </>
                           ) : (
                             <>
-                              <FaCopy size={20} className="text-gray-500" />
-                              <span>Copy Link</span>
+                              <FaCopy size={18} className="text-gray-500" />
+                              <span className="text-sm">Copy Link</span>
                             </>
                           )}
-                        </button>
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -578,28 +543,21 @@ const FullImageView = ({
               <motion.button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-lg shadow-gray-500/30 font-medium relative overflow-hidden"
-                whileHover={{
-                  scale: isDownloading ? 1 : 1.05,
-                  y: isDownloading ? 0 : -2,
-                }}
+                className="flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all relative overflow-hidden"
+                whileHover={{ scale: isDownloading ? 1 : 1.05 }}
                 whileTap={{ scale: isDownloading ? 1 : 0.95 }}
                 aria-label="Download artwork"
               >
                 {isDownloading && (
                   <div
-                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-300"
+                    className="absolute left-0 top-0 h-full bg-green-500 transition-all"
                     style={{ width: `${downloadProgress}%` }}
                   />
                 )}
-                <span className="relative z-10 flex items-center gap-2">
+                <span className="relative z-10 flex items-center gap-2 text-sm sm:text-base">
                   {downloadSuccess ? (
-                    <motion.div
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      className="flex items-center gap-2"
-                    >
-                      <MdCheckCircle size={20} className="text-white" />
+                    <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+                      <MdCheckCircle size={18} />
                       <span>Downloaded!</span>
                     </motion.div>
                   ) : isDownloading ? (
@@ -609,7 +567,7 @@ const FullImageView = ({
                     </>
                   ) : (
                     <>
-                      <FaDownload size={18} />
+                      <FaDownload size={16} />
                       <span>Download</span>
                     </>
                   )}

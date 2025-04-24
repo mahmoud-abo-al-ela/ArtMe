@@ -195,7 +195,7 @@ function ArtistProfile() {
     setCurrentPage(pageNumber);
     // Scroll to top of gallery section
     window.scrollTo({
-      top: document.querySelector(".artworks-section").offsetTop - 100,
+      top: document.querySelector(".artworks-section")?.offsetTop - 100 || 0,
       behavior: "smooth",
     });
   };
@@ -318,17 +318,17 @@ function ArtistProfile() {
   const filterOptions = getFilterOptions();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 mt-15">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-12 mt-15">
       {/* Back to Artists Button */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="mb-6"
+        className="mb-2 sm:mb-6"
       >
         <Link
           to="/artists"
-          className="inline-flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-all shadow-sm hover:shadow-md font-medium"
+          className="inline-flex items-center gap-2 bg-white text-indigo-600 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-indigo-50 transition-all shadow-sm hover:shadow-md font-medium text-sm"
         >
           <FiArrowLeft /> All Artists
         </Link>
@@ -350,12 +350,13 @@ function ArtistProfile() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl overflow-hidden shadow-lg"
+        className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg"
       >
-        <div className="md:flex p-6 md:p-0">
-          <div className="md:w-1/3 flex justify-center items-center p-8 relative">
+        <div className="flex flex-col md:flex-row">
+          {/* Mobile profile section with better spacing */}
+          <div className="w-full flex flex-col items-center p-6 pt-8 pb-4 md:w-1/3 md:p-8">
             <motion.div
-              className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden relative shadow-xl ring-8 ring-white/50"
+              className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full overflow-hidden relative shadow-xl ring-4 ring-white/50"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -363,7 +364,7 @@ function ArtistProfile() {
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-full">
                   <FaSpinner
                     className="animate-spin text-indigo-500"
-                    size={32}
+                    size={24}
                   />
                 </div>
               )}
@@ -377,20 +378,63 @@ function ArtistProfile() {
               />
             </motion.div>
           </div>
-          <div className="md:w-2/3 p-8 flex flex-col justify-center">
-            <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 leading-tight">
-              {artist.name}
-            </h1>
 
-            <div className="prose prose-lg max-w-none mb-6">
-              <p className="text-gray-700 leading-relaxed">
+          {/* Info section with better mobile spacing */}
+          <div className="w-full px-6 pb-6 md:w-2/3 md:p-8 md:pt-8 flex flex-col justify-center">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3 leading-tight text-center md:text-left">
+              {artist.name}
+            </h2>
+
+            <div className="prose prose-lg max-w-none mb-5 sm:mb-6 text-center md:text-left">
+              <p className="text-gray-700 leading-relaxed text-sm sm:text-base md:text-lg">
                 {artist.bio ||
                   "Talented artist showcasing their creative work."}
               </p>
             </div>
 
-            {/* Social links */}
-            <div className="flex flex-wrap items-center gap-4">
+            {/* Statistics row - only on mobile */}
+            <div className="flex justify-center md:hidden mb-5 gap-6">
+              <div className="flex flex-col items-center">
+                <span className="font-bold text-indigo-600">
+                  {artworks.length}
+                </span>
+                <span className="text-xs text-gray-600">Artworks</span>
+              </div>
+              {artist.followers !== undefined && (
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-indigo-600">
+                    {artist.followers}
+                  </span>
+                  <span className="text-xs text-gray-600">Followers</span>
+                </div>
+              )}
+              {artist.location && (
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-indigo-600">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 inline"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                    </svg>
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    {artist.location}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Social links with better mobile sizing */}
+            <div className="flex flex-wrap items-center gap-4 justify-center md:justify-start">
               {socialLinks.instagram && (
                 <motion.a
                   href={socialLinks.instagram}
@@ -401,7 +445,7 @@ function ArtistProfile() {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <FiInstagram size={20} />
+                  <FiInstagram size={18} className="sm:text-lg" />
                 </motion.a>
               )}
               {socialLinks.facebook && (
@@ -414,7 +458,33 @@ function ArtistProfile() {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <FiFacebook size={20} />
+                  <FiFacebook size={18} className="sm:text-lg" />
+                </motion.a>
+              )}
+              {socialLinks.twitter && (
+                <motion.a
+                  href={socialLinks.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 hover:text-blue-400 hover:bg-blue-50 transition-all shadow-sm"
+                  aria-label="Twitter"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <FiTwitter size={18} className="sm:text-lg" />
+                </motion.a>
+              )}
+              {socialLinks.website && (
+                <motion.a
+                  href={socialLinks.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 hover:text-teal-600 hover:bg-teal-50 transition-all shadow-sm"
+                  aria-label="Website"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <FiGlobe size={18} className="sm:text-lg" />
                 </motion.a>
               )}
             </div>
@@ -423,7 +493,7 @@ function ArtistProfile() {
       </motion.div>
 
       {/* Artist's gallery section */}
-      <div className="pt-8 relative artworks-section">
+      <div className="pt-4 sm:pt-8 relative artworks-section">
         {/* Gallery header */}
         <motion.div
           className={`bg-white rounded-lg py-3 px-4 w-full mb-5`}
@@ -431,19 +501,19 @@ function ArtistProfile() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-            <h2 className="text-3xl font-display font-semibold text-gray-900 relative">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+            <h2 className="text-2xl sm:text-3xl font-display font-semibold text-gray-900 relative">
               <span className="relative">Artworks</span>
-              <span className="absolute -bottom-3 left-0 w-12 h-2 bg-indigo-200 rounded-full z-0"></span>
+              <span className="absolute -bottom-2 sm:-bottom-3 left-0 w-12 h-2 bg-indigo-200 rounded-full z-0"></span>
             </h2>
 
             {/* Controls section with filter and sort dropdowns */}
             {artworks.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                 {/* Filter dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <motion.div
-                    className="cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all
+                    className="cursor-pointer px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all
                       bg-indigo-600 text-white shadow-md hover:bg-indigo-700 flex items-center gap-2"
                     onClick={() => setShowDropdown(!showDropdown)}
                     whileHover={{ scale: 1.05 }}
@@ -466,7 +536,7 @@ function ArtistProfile() {
                   {/* Filter dropdown menu */}
                   {showDropdown && (
                     <motion.div
-                      className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+                      className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -529,13 +599,13 @@ function ArtistProfile() {
                 {/* Sort dropdown */}
                 <div className="relative" ref={sortDropdownRef}>
                   <motion.div
-                    className="cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all
-                      bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2"
+                    className="cursor-pointer px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all
+                      bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-1 sm:gap-2"
                     onClick={() => setShowSortDropdown(!showSortDropdown)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Sort by: {getSortLabel(activeSortOption)}
+                    Sort: {getSortLabel(activeSortOption)}
                     <span
                       className={`transition-transform duration-300 ${
                         showSortDropdown ? "rotate-180" : ""
@@ -548,7 +618,7 @@ function ArtistProfile() {
                   {/* Sort dropdown menu */}
                   {showSortDropdown && (
                     <motion.div
-                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+                      className="absolute top-full right-0 mt-2 w-44 bg-white rounded-lg shadow-lg overflow-hidden z-20"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -581,7 +651,7 @@ function ArtistProfile() {
         </motion.div>
 
         {filteredArtworks.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
+          <div className="text-center py-12 sm:py-16 bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
             <p className="text-gray-500 text-lg">
               {activeFilter === "all"
                 ? "No artworks available from this artist yet."
@@ -590,7 +660,7 @@ function ArtistProfile() {
             {activeFilter !== "all" && (
               <div
                 onClick={() => setActiveFilter("all")}
-                className="cursor-pointer mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
+                className="cursor-pointer mx-auto mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all inline-block"
               >
                 Show all artworks
               </div>
@@ -599,7 +669,7 @@ function ArtistProfile() {
         ) : (
           <AnimatePresence key={`${activeFilter}-${activeSortOption}`}>
             <motion.div
-              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-max ${
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 auto-rows-max ${
                 filterApplied || sortApplied ? "animate-pulse" : ""
               }`}
               layout
@@ -617,7 +687,7 @@ function ArtistProfile() {
                     layout: { type: "spring", damping: 15 },
                   }}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className={`${index % 3 === 1 ? "md:mt-8" : ""}`} // Create masonry-like layout
+                  className={`${index % 3 === 1 ? "sm:mt-4 md:mt-8" : ""}`} // Create masonry-like layout
                 >
                   <ArtworkCard
                     artwork={artwork}
@@ -636,6 +706,7 @@ function ArtistProfile() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              className="mt-4 sm:mt-8"
             >
               <Pagination
                 currentPage={currentPage}
@@ -653,15 +724,15 @@ function ArtistProfile() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-10 shadow-lg text-white overflow-hidden relative"
+        className="mt-8 sm:mt-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl sm:rounded-2xl p-5 sm:p-10 shadow-lg text-white overflow-hidden relative"
       >
         <div className="absolute top-0 left-0 w-full h-full bg-pattern opacity-10"></div>
         <div className="relative z-10 md:flex items-center justify-between">
-          <div className="md:w-2/3 mb-6 md:mb-0">
-            <h2 className="text-3xl font-display font-semibold mb-4">
-              Do you have artworks to show ?
+          <div className="md:w-2/3 mb-4 md:mb-0">
+            <h2 className="text-xl sm:text-3xl font-display font-semibold mb-2 sm:mb-4">
+              Do you have artworks to show?
             </h2>
-            <p className="text-indigo-100 text-lg mb-0">
+            <p className="text-indigo-100 text-sm sm:text-lg mb-0">
               Contact me to create your profile.
             </p>
           </div>
@@ -669,11 +740,11 @@ function ArtistProfile() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
               <a
                 href="https://www.instagram.com/mo0o__7lli__/"
-                className="inline-flex items-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 px-6 py-3 rounded-lg transition-all shadow-md hover:shadow-lg font-medium"
+                className="inline-flex items-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-all shadow-md hover:shadow-lg font-medium text-sm sm:text-base"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiMail size={18} />
+                <FiMail size={16} className="sm:text-lg" />
                 <span>Contact Me</span>
               </a>
             </motion.div>

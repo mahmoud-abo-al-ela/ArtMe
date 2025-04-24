@@ -24,7 +24,7 @@ function Footer() {
       className={`w-full transition-all duration-500 py-3 border-t border-gray-200`}
     >
       <div className="max-w-7xl mx-auto px-4">
-        <p className="text-center font-medium text-indigo-800">
+        <p className="text-center font-medium text-indigo-800 text-sm sm:text-base">
           &copy; {new Date().getFullYear()}
           <span className="ml-2 font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
             ArtMe

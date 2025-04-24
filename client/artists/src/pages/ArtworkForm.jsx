@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaSpinner, FaImages } from "react-icons/fa";
 import toast from "react-hot-toast";
+import ImageUploader from "../components/artwork/ImageUploader";
+import ArtworkDetails from "../components/artwork/ArtworkDetails";
+import FormButtons from "../components/artwork/FormButtons";
+import LoadingState from "../components/common/LoadingState";
+import ErrorState from "../components/common/ErrorState";
 
 function ArtworkForm({ user }) {
   const { id } = useParams();
@@ -47,7 +51,6 @@ function ArtworkForm({ user }) {
           );
           const artwork = res.data;
 
-          // Check if the artwork belongs to the logged in user
           if (artwork.artist._id !== user.id) {
             setError("You do not have permission to edit this artwork.");
             setLoading(false);
@@ -82,30 +85,8 @@ function ArtworkForm({ user }) {
     setFormTouched(true);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  const handleImageChange = (file) => {
     if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setFormTouched(true);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
       setImage(file);
       const reader = new FileReader();
       reader.onload = () => {
@@ -135,9 +116,7 @@ function ArtworkForm({ user }) {
       if (image) {
         formDataToSend.append("image", image);
       }
-      // Add artist ID explicitly
       formDataToSend.append("artist", user.id);
-
       let response;
       if (id) {
         response = await axios.put(
@@ -188,31 +167,11 @@ function ArtworkForm({ user }) {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-48 bg-gray-200 rounded mb-4"></div>
-          <div className="h-64 w-full max-w-md bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
-        <div className="text-center bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full">
-          <h2 className="text-xl text-red-700 font-medium mb-3">Error</h2>
-          <p className="text-red-600">{error}</p>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="mt-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-          >
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorState error={error} onBack={() => navigate("/dashboard")} />;
   }
 
   return (
@@ -234,400 +193,46 @@ function ArtworkForm({ user }) {
 
           {/* Mobile - single column layout */}
           <div className="flex flex-col md:hidden gap-6">
-            {/* Image upload section - Mobile */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Artwork Image {!id && <span className="text-red-500">*</span>}
-              </label>
-              <div
-                className="relative"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                {previewUrl ? (
-                  <div className="mb-4 relative group">
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-auto rounded-lg shadow-sm object-contain max-h-48"
-                    />
-                    <div className="absolute inset-0 bg-[#23232e6f] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-                      <div
-                        type="button"
-                        onClick={() =>
-                          document.getElementById("image-upload").click()
-                        }
-                        className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 shadow-lg"
-                      >
-                        Change Image
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    className="mt-1 flex justify-center px-4 pt-6 pb-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                    onClick={() =>
-                      document.getElementById("image-upload").click()
-                    }
-                  >
-                    <div className="space-y-2 text-center">
-                      <FaImages className="mx-auto h-12 w-12 text-gray-400" />
-                      <div>
-                        <p className="text-sm text-gray-600">
-                          Tap to upload image
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  id="image-upload"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  required={!id && !previewUrl}
-                  className="sr-only"
-                />
-              </div>
-            </div>
+            <ImageUploader
+              previewUrl={previewUrl}
+              onImageChange={handleImageChange}
+              isRequired={!id}
+              isMobile={true}
+            />
 
-            {/* Form fields - Mobile */}
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter artwork title"
-                  className="w-full bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-2.5 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-2.5 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="description-mobile"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Description <span className="text-gray-500">(optional)</span>
-                </label>
-                <textarea
-                  id="description-mobile"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={3}
-                  placeholder="Describe your artwork"
-                  className="w-full bg-gray-100 text-black placeholder:text-gray-500 px-4 py-2.5 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg"
-                />
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center mb-4">
-                  <div className="relative flex items-start">
-                    <div className="flex items-center h-5">
-                      <input
-                        type="checkbox"
-                        id="isForSale-mobile"
-                        name="isForSale"
-                        checked={formData.isForSale}
-                        onChange={handleChange}
-                        className="h-5 w-5 outline-none border-2 border-gray-300 rounded appearance-none checked:bg-indigo-600 bg-white"
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label
-                        htmlFor="isForSale-mobile"
-                        className="font-medium text-gray-700"
-                      >
-                        This artwork is for sale
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                {formData.isForSale && (
-                  <div className="border-t border-gray-200 pt-4 animate-fadein">
-                    <label
-                      htmlFor="price-mobile"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Price <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="number"
-                        id="price-mobile"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required={formData.isForSale}
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="w-full pl-4 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-2.5 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 sm:text-sm">EGP</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ArtworkDetails
+              formData={formData}
+              handleChange={handleChange}
+              categories={categories}
+              isMobile={true}
+            />
           </div>
 
           {/* Tablet and Desktop - two column layout */}
           <div className="hidden md:grid md:grid-cols-2 gap-8">
-            {/* Image upload section - Desktop */}
+            <ImageUploader
+              previewUrl={previewUrl}
+              onImageChange={handleImageChange}
+              isRequired={!id}
+              isMobile={false}
+            />
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Artwork Image {!id && <span className="text-red-500">*</span>}
-              </label>
-              <div
-                className="relative"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                {previewUrl ? (
-                  <div className="mb-4 relative group">
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-auto rounded-lg shadow-sm object-contain max-h-64"
-                    />
-                    <div className="absolute inset-0 bg-[#23232e6f] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-                      <div
-                        type="button"
-                        onClick={() =>
-                          document
-                            .getElementById("image-upload-desktop")
-                            .click()
-                        }
-                        className="cursor-pointer bg-white text-gray-800 px-5 py-2.5 rounded-md text-sm font-medium hover:bg-gray-100 shadow-lg"
-                      >
-                        Change Image
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                    onClick={() =>
-                      document.getElementById("image-upload-desktop").click()
-                    }
-                  >
-                    <div className="space-y-3 text-center">
-                      <FaImages className="mx-auto h-16 w-16 text-gray-400" />
-                      <div>
-                        <p className="text-base text-gray-600">
-                          Drag and drop your image here, or click to browse
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  id="image-upload-desktop"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  required={!id && !previewUrl}
-                  className="sr-only"
-                />
-              </div>
-            </div>
-
-            {/* Form fields - Desktop */}
-            <div className="space-y-6">
-              <div>
-                <label
-                  htmlFor="title-desktop"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title-desktop"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter artwork title"
-                  className="w-full bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="category-desktop"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    id="category-desktop"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="description-desktop"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Description <span className="text-gray-500">(optional)</span>
-                </label>
-                <textarea
-                  id="description-desktop"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows={4}
-                  placeholder="Describe your artwork (media, inspiration, context...)"
-                  className="w-full bg-gray-100 text-black placeholder:text-gray-500 px-4 py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg"
-                />
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center mb-4">
-                  <div className="relative flex items-start">
-                    <div className="flex items-center h-5">
-                      <input
-                        type="checkbox"
-                        id="isForSale-desktop"
-                        name="isForSale"
-                        checked={formData.isForSale}
-                        onChange={handleChange}
-                        className="h-5 w-5 outline-none border-2 border-gray-300 rounded appearance-none checked:bg-indigo-600 bg-white"
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label
-                        htmlFor="isForSale-desktop"
-                        className="font-medium text-gray-700"
-                      >
-                        This artwork is for sale
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                {formData.isForSale && (
-                  <div className="border-t border-gray-200 pt-4 animate-fadein">
-                    <label
-                      htmlFor="price-desktop"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Price <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <input
-                        type="number"
-                        id="price-desktop"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required={formData.isForSale}
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="w-full pl-4 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-4 py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 sm:text-sm">EGP</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <ArtworkDetails
+                formData={formData}
+                handleChange={handleChange}
+                categories={categories}
+                isMobile={false}
+              />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
-          {!uploading && (
-            <button
-              type="button"
-              onClick={confirmCancel}
-              className="w-full sm:w-auto px-4 py-2.5 sm:px-5 sm:py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-colors"
-            >
-              Cancel
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={uploading}
-            className="w-full sm:w-auto px-4 py-2.5 sm:px-5 sm:py-3 bg-indigo-600 text-white rounded-lg shadow-sm hover:bg-indigo-700 disabled:bg-indigo-400 font-medium flex items-center justify-center min-w-[120px] transition-colors"
-          >
-            {uploading ? (
-              <>
-                <FaSpinner className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-                Saving...
-              </>
-            ) : id ? (
-              "Update Artwork"
-            ) : (
-              "Add Artwork"
-            )}
-          </button>
-        </div>
+        <FormButtons
+          uploading={uploading}
+          onCancel={confirmCancel}
+          isEdit={!!id}
+        />
       </form>
     </div>
   );

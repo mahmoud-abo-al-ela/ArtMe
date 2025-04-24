@@ -7,7 +7,6 @@ const authRoutes = require("./routes/auth");
 const artworkRoutes = require("./routes/artworks");
 const artistsRoutes = require("./routes/artists");
 const adminRoutes = require("./routes/admin");
-
 dotenv.config();
 
 const app = express();

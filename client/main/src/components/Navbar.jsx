@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
-
+import { FaBars, FaTimes } from "react-icons/fa";
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const mobileMenuRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -16,6 +18,29 @@ function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Scroll to top when location changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isMobileMenuOpen &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        mobileMenuButtonRef.current &&
+        !mobileMenuButtonRef.current.contains(event.target)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   // Function to check if link is active
   const isActive = (path) => {
@@ -45,7 +70,7 @@ function Navbar() {
           <Link to="/" className="flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
-              className={`h-8 w-8 ${
+              className={`h-6 w-6 sm:h-8 sm:w-8 ${
                 isScrolled || !isActive("/") ? "text-indigo-600" : "text-white"
               }`}
               fill="none"
@@ -72,7 +97,7 @@ function Navbar() {
               />
             </svg>
             <span
-              className={`ml-2 pb-1 text-3xl font-bold ${
+              className={`ml-2 pb-1 text-2xl sm:text-3xl font-bold ${
                 isScrolled || !isActive("/")
                   ? "bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600"
                   : "text-white"
@@ -130,10 +155,11 @@ function Navbar() {
 
           {/* Mobile menu button */}
           <div className="lg:hidden flex items-center">
-            <button
+            <div
+              ref={mobileMenuButtonRef}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`p-2.5 rounded-lg transition-all duration-300 ${
-                isScrolled
+                isScrolled || !isActive("/")
                   ? "text-indigo-800 hover:text-indigo-600 hover:bg-indigo-100/60 focus:outline-none focus:ring-2 focus:ring-indigo-300"
                   : "text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30"
               }`}
@@ -141,32 +167,12 @@ function Navbar() {
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7 transition-all duration-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isMobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                    className="animate-fade-in"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                    className="animate-fade-in"
-                  />
-                )}
-              </svg>
-            </button>
+              {isMobileMenuOpen ? (
+                <FaTimes className="text-lg" />
+              ) : (
+                <FaBars className="text-lg" />
+              )}
+            </div>
           </div>
         </div>
 
@@ -174,9 +180,10 @@ function Navbar() {
         {isMobileMenuOpen && (
           <div
             id="mobile-menu"
+            ref={mobileMenuRef}
             role="menu"
             className={`lg:hidden mt-5 pt-4 pb-6 rounded-xl shadow-xl ${
-              isScrolled
+              isScrolled || !isActive("/")
                 ? "bg-white/95 backdrop-blur-lg border-t border-indigo-100"
                 : "bg-gray-900/80 backdrop-blur-lg border border-white/10"
             }`}
@@ -184,12 +191,12 @@ function Navbar() {
           >
             <Link
               to="/"
-              className={`block py-3 px-6 text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
+              className={`block py-3 px-6 text-base sm:text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
                 isActive("/")
-                  ? isScrolled
+                  ? isScrolled || !isActive("/")
                     ? "bg-indigo-600 text-white font-semibold"
                     : "bg-white/20 text-white font-semibold"
-                  : isScrolled
+                  : isScrolled || !isActive("/")
                   ? "text-gray-800 hover:bg-gray-100 hover:text-indigo-600"
                   : "text-white hover:bg-white/10"
               }`}
@@ -199,27 +206,27 @@ function Navbar() {
             </Link>
             <Link
               to="/gallery"
-              className={`block py-3 px-6 text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
+              className={`block py-3 px-6 text-base sm:text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
                 isActive("/gallery")
-                  ? isScrolled
+                  ? isScrolled || !isActive("/")
                     ? "bg-indigo-600 text-white font-semibold"
                     : "bg-white/20 text-white font-semibold"
-                  : isScrolled
+                  : isScrolled || !isActive("/")
                   ? "text-gray-800 hover:bg-gray-100 hover:text-indigo-600"
                   : "text-white hover:bg-white/10"
               }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Gallery
+              Artworks
             </Link>
             <Link
               to="/artists"
-              className={`block py-3 px-6 text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
+              className={`block py-3 px-6 text-base sm:text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
                 isActive("/artists")
-                  ? isScrolled
+                  ? isScrolled || !isActive("/")
                     ? "bg-indigo-600 text-white font-semibold"
                     : "bg-white/20 text-white font-semibold"
-                  : isScrolled
+                  : isScrolled || !isActive("/")
                   ? "text-gray-800 hover:bg-gray-100 hover:text-indigo-600"
                   : "text-white hover:bg-white/10"
               }`}

@@ -28,9 +28,9 @@ const BackToTop = () => {
 
   return (
     <>
-      <button
+      <div
         onClick={scrollToTop}
-        className={`!focus:outline-none focus:outline-none focus:ring-0 active:outline-none focus-visible:outline-none fixed bottom-6 right-6 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl z-50 transition-all duration-500 ease-in-out ${
+        className={`cursor-pointer !focus:outline-none focus:outline-none focus:ring-0 active:outline-none focus-visible:outline-none fixed bottom-6 right-6 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl z-50 transition-all duration-500 ease-in-out ${
           isVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 pointer-events-none"
@@ -38,8 +38,8 @@ const BackToTop = () => {
         aria-label="Back to top"
         style={{ outline: "none" }}
       >
-        <IoIosArrowUp size={24} />
-      </button>
+        <IoIosArrowUp className="text-lg" />
+      </div>
     </>
   );
 };
