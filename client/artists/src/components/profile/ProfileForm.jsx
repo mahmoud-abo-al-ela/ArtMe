@@ -26,7 +26,7 @@ function ProfileForm({ formData, handleChange, isReadOnly = false }) {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full pl-10 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-3 py-2 sm:px-4 sm:py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
+            className="w-full pl-10 py-2 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
             required
             readOnly={isReadOnly}
             disabled={isReadOnly}
@@ -45,7 +45,7 @@ function ProfileForm({ formData, handleChange, isReadOnly = false }) {
           <input
             type="email"
             value={formData.email}
-            className="w-full pl-10 bg-gray-200 text-gray-500 border-gray-300 rounded-lg shadow-sm px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base"
+            className="w-full pl-10 py-2 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
             disabled
             readOnly
           />
@@ -93,7 +93,7 @@ function ProfileForm({ formData, handleChange, isReadOnly = false }) {
               name="social.instagram"
               value={formData.socialLinks.instagram}
               onChange={handleChange}
-              className="w-full pl-10 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-3 py-2 sm:px-4 sm:py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
+              className="w-full pl-10 py-2 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
               placeholder="https://instagram.com/yourusername"
               readOnly={isReadOnly}
               disabled={isReadOnly}
@@ -109,7 +109,7 @@ function ProfileForm({ formData, handleChange, isReadOnly = false }) {
               name="social.facebook"
               value={formData.socialLinks.facebook}
               onChange={handleChange}
-              className="w-full pl-10 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm px-3 py-2 sm:px-4 sm:py-3 outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
+              className="w-full pl-10 py-2 bg-gray-100 text-black border-gray-300 rounded-lg shadow-sm outline-none border-0 focus:border-1 focus:border-indigo-500 focus:ring-indigo-500 text-sm sm:text-base"
               placeholder="https://facebook.com/yourusername"
               readOnly={isReadOnly}
               disabled={isReadOnly}

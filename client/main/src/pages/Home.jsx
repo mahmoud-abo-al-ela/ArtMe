@@ -171,11 +171,11 @@ function Home() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
-                  to="/gallery"
+                  to="/artworks"
                   className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium rounded-lg shadow-lg text-indigo-900 bg-white hover:bg-indigo-50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   aria-label="Explore the art gallery"
                 >
-                  Explore Gallery
+                  Explore Artworks
                 </Link>
               </motion.div>
               <motion.div
@@ -212,7 +212,7 @@ function Home() {
               </p>
             </div>
             <Link
-              to="/gallery"
+              to="/artworks"
               className="text-xs sm:text-base pb-8 sm:pb-0 text-indigo-600 font-medium inline-flex items-center hover:underline"
             >
               View All
