@@ -124,9 +124,9 @@ function Navbar() {
               Home
             </Link>
             <Link
-              to="/gallery"
+              to="/artworks"
               className={`font-medium px-3 py-2 transition-all duration-300 rounded-md ${
-                isActive("/gallery")
+                isActive("/artworks")
                   ? isScrolled || !isActive("/")
                     ? "text-white bg-indigo-600 shadow-md hover:bg-indigo-700"
                     : "text-indigo-100 bg-white/20 backdrop-blur-sm shadow-lg"
@@ -205,9 +205,9 @@ function Navbar() {
               Home
             </Link>
             <Link
-              to="/gallery"
+              to="/artworks"
               className={`block py-3 px-6 text-base sm:text-lg rounded-lg mx-2 mb-2 font-medium transition-all duration-300 ${
-                isActive("/gallery")
+                isActive("/artworks")
                   ? isScrolled || !isActive("/")
                     ? "bg-indigo-600 text-white font-semibold"
                     : "bg-white/20 text-white font-semibold"
