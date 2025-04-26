@@ -117,8 +117,8 @@ function ArtistList() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8 mt-15">
-        <div className="container mx-auto px-3 sm:px-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-15">
           <div className="text-center max-w-3xl mx-auto mb-3 sm:mb-5">
             <div className="h-8 sm:h-10 bg-gray-200 rounded w-32 sm:w-48 mx-auto mb-3 sm:mb-4 animate-pulse"></div>
             <div className="h-3 sm:h-4 bg-gray-200 rounded w-48 sm:w-64 mx-auto animate-pulse"></div>
@@ -141,35 +141,33 @@ function ArtistList() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8 mt-15">
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="text-center max-w-3xl mx-auto mb-3 sm:mb-5">
-          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-display font-semibold mb-2 sm:mb-4 text-black">
-            Our Artists
-          </h2>
-          <p className="text-xs sm:text-sm md:text-base text-gray-500 px-3 sm:px-0">
-            Discover talented artists from around the world showcasing their
-            unique work.
-          </p>
-        </div>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-15">
+      <div className="text-center max-w-3xl mx-auto mb-3 sm:mb-5">
+        <h2 className="text-2xl sm:text-3xl lg:text-5xl font-display font-semibold mb-2 sm:mb-4 text-black">
+          Our Artists
+        </h2>
+        <p className="text-xs sm:text-sm md:text-base text-gray-500 px-3 sm:px-0">
+          Discover talented artists from around the world showcasing their
+          unique work.
+        </p>
+      </div>
 
-        {/* Search */}
-        <div className="max-w-md mx-auto mb-6 sm:mb-8 lg:mb-12 px-3 sm:px-0">
-          <div className="relative">
-            <FaSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              size={16}
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              placeholder="Search artists by name..."
-              className="pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base text-gray-500 border border-gray-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full transition-all duration-200 shadow-sm hover:shadow-md"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search artists"
-            />
-          </div>
+      {/* Search */}
+      <div className="max-w-md mx-auto mb-6 sm:mb-8 lg:mb-12 px-3 sm:px-0">
+        <div className="relative">
+          <FaSearch
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+            size={16}
+            aria-hidden="true"
+          />
+          <input
+            type="text"
+            placeholder="Search artists by name..."
+            className="pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base text-gray-500 border border-gray-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full transition-all duration-200 shadow-sm hover:shadow-md"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search artists"
+          />
         </div>
       </div>
 
