@@ -24,7 +24,11 @@ const corsOptions = {
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-  ],
+    // Add your production frontend URLs here
+    process.env.CLIENT_URL,
+    process.env.ADMIN_URL,
+    process.env.ARTIST_URL,
+  ].filter(Boolean),
   optionsSuccessStatus: 200,
 };
 
