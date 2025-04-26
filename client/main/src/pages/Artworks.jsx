@@ -296,7 +296,7 @@ function Gallery() {
 
       <div className="text-center max-w-3xl mx-auto mb-5">
         <h2 className="text-2xl sm:text-3xl lg:text-5xl text-black font-display font-semibold mb-4">
-          Artwork Gallery
+          Artworks
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-gray-500">
           Explore our curated collection of exceptional artwork from talented
