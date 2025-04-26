@@ -33,7 +33,7 @@ function Home() {
       easing: "ease-out",
       once: true,
       offset: 50,
-      disable: "mobile", // Disable animations on mobile for performance
+      disable: false, // Enable animations on all devices
     });
 
     return () => {
@@ -121,7 +121,7 @@ function Home() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-[85vh] bg-gray-50">
+      <div className="flex items-center justify-center min-h-[85vh] bg-gray-50 w-full">
         <LoadingSpinner />
       </div>
     );
@@ -152,16 +152,16 @@ function Home() {
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
-        <div className="w-full mx-auto h-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-32 flex items-center">
+        <div className="w-full mx-auto h-full px-4 sm:px-6 lg:px-8 py-8 sm:py-16 lg:py-32 flex items-center">
           <div
             className="w-full lg:w-1/2 lg:pr-12"
             data-aos="fade-right"
             data-aos-delay="200"
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200 leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200 leading-tight">
               Discover Extraordinary Artwork
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-indigo-100 mb-6 sm:mb-8 max-w-md">
+            <p className="text-sm sm:text-lg lg:text-xl text-indigo-100 mb-6 sm:mb-8 max-w-md">
               Explore a curated collection of stunning artworks and connect with
               talented artists.
             </p>
@@ -227,8 +227,8 @@ function Home() {
               slidesPerView={1}
               breakpoints={{
                 480: {
-                  slidesPerView: 1.5,
-                  spaceBetween: 16,
+                  slidesPerView: 1.2,
+                  spaceBetween: 12,
                 },
                 640: {
                   slidesPerView: 2,
@@ -306,7 +306,7 @@ function Home() {
                 data-aos-delay={100 + index * 100}
               >
                 <div className="bg-gray-100 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
-                  <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                  <div className="flex items-center space-x-2 sm:space-x-4 mb-2 sm:mb-4">
                     <img
                       src={
                         artist.profileImage ||
@@ -315,10 +315,10 @@ function Home() {
                         )}&background=6366f1&color=fff&size=256`
                       }
                       alt={artist.name}
-                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"
+                      className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover"
                     />
                     <div>
-                      <h3 className="font-medium text-gray-900 capitalize text-base sm:text-lg group-hover:text-indigo-600 transition-colors">
+                      <h3 className="font-medium text-gray-900 capitalize text-sm sm:text-lg group-hover:text-indigo-600 transition-colors">
                         {artist.name}
                       </h3>
                       <p className="text-gray-500 text-xs sm:text-sm">

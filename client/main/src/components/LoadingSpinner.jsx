@@ -13,7 +13,7 @@ const LoadingSpinner = ({ size = "medium" }) => {
   const sizeClass = sizeMap[size] || sizeMap.medium;
 
   return (
-    <div className="flex items-center justify-center h-screen w-[99vw] bg-white z-50">
+    <div className="flex items-center justify-center h-screen w-full bg-white z-50">
       <div className={`loading-spinner-container ${sizeClass}`}>
         <svg
           viewBox="0 0 24 24"

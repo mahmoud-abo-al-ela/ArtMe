@@ -478,7 +478,7 @@ const FullImageView = ({
             {/* Action Buttons */}
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <motion.div className="relative flex-1">
-                <motion.button
+                <motion.div
                   onClick={handleShare}
                   className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
                   whileHover={{ scale: 1.05 }}
@@ -487,7 +487,7 @@ const FullImageView = ({
                 >
                   <FaShare size={16} />
                   <span className="text-sm sm:text-base">Share</span>
-                </motion.button>
+                </motion.div>
                 <AnimatePresence>
                   {showShareOptions && (
                     <motion.div
@@ -540,7 +540,7 @@ const FullImageView = ({
                   )}
                 </AnimatePresence>
               </motion.div>
-              <motion.button
+              <motion.div
                 onClick={handleDownload}
                 disabled={isDownloading}
                 className="flex-1 flex items-center justify-center gap-2 py-2 sm:py-3 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all relative overflow-hidden"
@@ -572,7 +572,7 @@ const FullImageView = ({
                     </>
                   )}
                 </span>
-              </motion.button>
+              </motion.div>
             </div>
           </motion.div>
         </motion.div>
