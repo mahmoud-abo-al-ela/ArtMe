@@ -253,13 +253,8 @@ function Gallery() {
         {/* Header Skeleton */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-15">
           <div className="text-center max-w-3xl mx-auto mb-5">
-            <div className="text-2xl sm:text-3xl lg:text-5xl text-black font-display font-semibold mb-4">
-              Artwork Gallery
-            </div>
-            <div className="text-xs sm:text-sm md:text-base text-gray-500">
-              Explore our curated collection of exceptional artwork from
-              talented artists around the world.
-            </div>
+            <div className="h-8 sm:h-10 bg-gray-200 rounded w-32 sm:w-48 mx-auto mb-3 sm:mb-4 animate-pulse"></div>
+            <div className="h-3 sm:h-4 bg-gray-200 rounded w-48 sm:w-64 mx-auto animate-pulse"></div>
           </div>
 
           {/* Search and Filter Skeleton */}
@@ -300,7 +295,7 @@ function Gallery() {
         </h2>
         <p className="text-xs sm:text-sm md:text-base text-gray-500">
           Explore our curated collection of exceptional artwork from talented
-          artists around the world.
+          artists.
         </p>
       </div>
 
