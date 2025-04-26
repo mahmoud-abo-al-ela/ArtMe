@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Gallery from "./pages/Gallery";
+import Artworks from "./pages/Artworks";
 import ArtistList from "./pages/ArtistList";
 import ArtistProfile from "./pages/ArtistProfile";
 import Navbar from "./components/Navbar";
@@ -15,7 +15,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/artworks" element={<Artworks />} />
             <Route path="/artists" element={<ArtistList />} />
             <Route path="/artists/:name" element={<ArtistProfile />} />
           </Routes>
